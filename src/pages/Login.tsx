@@ -33,7 +33,17 @@ export function Login() {
       if (error) throw error;
 
       if (data.user) {
-        navigate('/dashboard');
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+          
+        if (profile?.role === 'ADMIN') {
+          navigate('/admin/requests');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
@@ -78,7 +88,17 @@ export function Login() {
       if (error) throw error;
 
       if (data.user) {
-        navigate('/dashboard');
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+          
+        if (profile?.role === 'ADMIN') {
+          navigate('/admin/requests');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Invalid verification code');

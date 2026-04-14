@@ -9,10 +9,8 @@ import { motion } from 'framer-motion';
 import { NotificationBell } from './NotificationBell';
 
 export function Sidebar() {
-  const { user, profile } = useAuthStore();
+  const { user, profile, isAdmin } = useAuthStore();
   const location = useLocation();
-  
-  const isAdmin = user?.email?.toLowerCase() === 'ps4689203@gmail.com';
 
   const navItems = isAdmin ? [
     { label: 'Requests', path: '/admin/requests', icon: GitPullRequest },

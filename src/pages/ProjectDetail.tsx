@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { supabase } from '@/src/lib/supabase';
+import { useAuthStore } from '@/src/store/authStore';
 import { Button } from '@/src/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/Card';
 import { CheckCircle, Clock, Download, MessageSquare, IndianRupee } from 'lucide-react';
@@ -14,6 +15,8 @@ export function ProjectDetail() {
   useEffect(() => {
     const fetchProject = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
         const { data, error } = await supabase
           .from('projects')
           .select('*')
@@ -21,9 +24,17 @@ export function ProjectDetail() {
           .single();
           
         if (error) throw error;
+        
+        // Security: Restrict project detail access to owner or admin
+        const { isAdmin } = useAuthStore.getState();
+        if (data.student_id !== user?.id && !isAdmin) {
+          throw new Error('Access denied');
+        }
+        
         setProject(data);
       } catch (error) {
         console.error('Error fetching project:', error);
+        setProject(null);
       } finally {
         setLoading(false);
       }
@@ -54,14 +65,32 @@ export function ProjectDetail() {
   }
 
   if (!project) {
-    return <div className="max-w-4xl mx-auto px-4 py-8 text-center">Project not found</div>;
+    return <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+      <h2 className="text-xl font-bold mb-2">Project not found</h2>
+      <p className="text-text-muted">This project may not exist or you don't have permission to view it.</p>
+      <Button variant="outline" className="mt-4" onClick={() => window.history.back()}>Go Back</Button>
+    </div>;
   }
 
-  const statuses = ['pending', 'approved', 'in_development', 'review', 'delivered'];
+  const statuses = [
+    'pending', 
+    'accepted', 
+    'awaiting_advance_payment', 
+    'in_development', 
+    'awaiting_final_payment', 
+    'delivered'
+  ];
+  
   const currentStatusIndex = statuses.indexOf(project.status);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {project.status === 'rejected' && (
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+          <strong>Project Rejected:</strong> {project.admin_notes || 'This project request was not accepted at this time.'}
+        </div>
+      )}
+      
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -70,9 +99,10 @@ export function ProjectDetail() {
               project.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
               project.status === 'in_development' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20 animate-pulse' :
               project.status === 'delivered' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+              project.status === 'rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
               'bg-surface text-text-muted border-border'
             }`}>
-              {project.status.replace('_', ' ')}
+              {project.status.replace(/_/g, ' ')}
             </span>
           </div>
           <p className="text-text-muted">{project.domain} • Created on {new Date(project.created_at).toLocaleDateString()}</p>
@@ -83,9 +113,9 @@ export function ProjectDetail() {
             <Download className="w-4 h-4" /> Download Files
           </Button>
         )}
-        {project.status === 'review' && (
+        {(project.status === 'awaiting_advance_payment' || project.status === 'awaiting_final_payment') && (
           <Button variant="glow" className="gap-2">
-            Pay Remaining ₹{project.budget / 2} to Unlock
+            <IndianRupee className="w-4 h-4" /> Pay {project.status.includes('advance') ? 'Upfront' : 'Balance'}
           </Button>
         )}
       </div>
@@ -100,11 +130,12 @@ export function ProjectDetail() {
             <CardContent>
               <div className="relative border-l border-border ml-3 space-y-6">
                 {[
-                  { id: 'pending', label: 'Submitted', desc: 'Project request received' },
-                  { id: 'approved', label: 'Approved', desc: 'Scope agreed & upfront paid' },
-                  { id: 'in_development', label: 'In Development', desc: 'We are building your project' },
-                  { id: 'review', label: 'Ready for Review', desc: 'Pay remaining balance to unlock' },
-                  { id: 'delivered', label: 'Delivered', desc: 'Files available for download' },
+                  { id: 'pending', label: 'Submitted', desc: 'Request received' },
+                  { id: 'accepted', label: 'Accepted', desc: 'Requirements verified' },
+                  { id: 'awaiting_advance_payment', label: 'Upfront Payment', desc: 'Awaiting 50% advance' },
+                  { id: 'in_development', label: 'Development', desc: 'Working on your project' },
+                  { id: 'awaiting_final_payment', label: 'Final Payment', desc: 'Ready! Pay remaining to unlock' },
+                  { id: 'delivered', label: 'Delivered', desc: 'Files provided' },
                 ].map((step, i) => {
                   const isCompleted = currentStatusIndex >= i;
                   const isCurrent = currentStatusIndex === i;

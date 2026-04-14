@@ -54,16 +54,11 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 // Simple admin check for MVP
 function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuthStore();
+  const { user, isAdmin, isLoading } = useAuthStore();
   
   if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  
   if (!user) return <Navigate to="/login" />;
-  
-  // Restrict admin access to specific email (strict, case-insensitive)
-  if (user.email?.toLowerCase() !== 'ps4689203@gmail.com') {
-    return <Navigate to="/dashboard" />;
-  }
+  if (!isAdmin) return <Navigate to="/dashboard" />;
   
   return <>{children}</>;
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/src/lib/supabase';
+import { useAuthStore } from '@/src/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
 import { FileText, CheckCircle, Activity, Users, Radio, X, Send } from 'lucide-react';
@@ -56,9 +57,11 @@ export function Requests() {
   const columns = [
     { id: 'pending', title: 'Pending' },
     { id: 'accepted', title: 'Accepted' },
-    { id: 'rejected', title: 'Rejected' },
+    { id: 'awaiting_advance_payment', title: 'Wait Advance' },
     { id: 'in_development', title: 'In Dev' },
-    { id: 'delivered', title: 'Delivered' }
+    { id: 'awaiting_final_payment', title: 'Wait Final' },
+    { id: 'delivered', title: 'Delivered' },
+    { id: 'rejected', title: 'Rejected' }
   ];
 
   const fetchProjects = async () => {
@@ -80,19 +83,65 @@ export function Requests() {
     }
   };
 
+  const VALID_TRANSITIONS: Record<string, string[]> = {
+    pending: ['accepted', 'rejected'],
+    accepted: ['awaiting_advance_payment', 'rejected'],
+    awaiting_advance_payment: ['in_development', 'rejected'],
+    in_development: ['awaiting_final_payment', 'delivered'],
+    awaiting_final_payment: ['delivered'],
+    delivered: [],
+    rejected: ['pending']
+  };
+
   const updateProject = async (projectId: string, updates: any) => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return;
+
+    // Transition Validation
+    if (updates.status && updates.status !== project.status) {
+      const allowed = VALID_TRANSITIONS[project.status as keyof typeof VALID_TRANSITIONS] || [];
+      if (!allowed.includes(updates.status)) {
+        alert(`Invalid transition: Cannot move from ${project.status} to ${updates.status}`);
+        return;
+      }
+    }
+
     try {
-      const { error } = await supabase
+      // 1. Update Project Status
+      const { error: updateError } = await supabase
         .from('projects')
         .update(updates)
         .eq('id', projectId);
         
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      // 2. Handle status change history and notifications
+      if (updates.status && updates.status !== project.status) {
+        const { user } = useAuthStore.getState();
+        
+        // Log History
+        await supabase.from('project_status_history').insert({
+          project_id: projectId,
+          old_status: project.status,
+          new_status: updates.status,
+          changed_by: user?.id,
+          notes: updates.admin_notes || `Status changed to ${updates.status.replace(/_/g, ' ')}`
+        });
+
+        // Create Notification for User
+        await supabase.from('notifications').insert({
+          user_id: project.student_id,
+          title: 'Project Update',
+          body: `Your project "${project.title}" is now: ${updates.status.replace(/_/g, ' ').toUpperCase()}`,
+          type: updates.status === 'delivered' ? 'success' : 'update'
+        });
+      }
       
       setProjects(projects.map(p => p.id === projectId ? { ...p, ...updates } : p));
-      fetchStats(); // Update counters
+      fetchStats(); 
     } catch (error) {
       console.error('Error updating project:', error);
+      alert('Failed to update project status');
     }
   };
 
