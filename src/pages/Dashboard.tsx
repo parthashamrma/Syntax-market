@@ -1,173 +1,185 @@
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuthStore } from '@/src/store/authStore';
-import { useProjectStore } from '@/src/store/projectStore';
 import { supabase } from '@/src/lib/supabase';
+import { useAuthStore } from '@/src/store/authStore';
+import { Card } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/Card';
-import { Plus, Clock, CheckCircle, AlertCircle, IndianRupee, Terminal } from 'lucide-react';
+import { 
+  Plus, FileText, CheckCircle, Clock, 
+  ChevronRight, Terminal, Activity
+} from 'lucide-react';
+import { cn } from '@/src/lib/utils';
+import { NotificationBell } from '@/src/components/layout/NotificationBell';
 
 export function Dashboard() {
   const { user, profile } = useAuthStore();
-  const { projects, setProjects, isLoading, setLoading } = useProjectStore();
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      if (!user) return;
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('projects')
-          .select('*')
-          .eq('student_id', user.id)
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        setProjects(data || []);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProjects();
-  }, [user, setProjects, setLoading]);
+  }, [user]);
 
-  const activeProjects = projects.filter(p => ['pending', 'accepted', 'in_development'].includes(p.status)).length;
-  const deliveredCount = projects.filter(p => p.status === 'delivered').length;
-  const totalSpent = projects.reduce((acc, p) => acc + (['accepted', 'in_development', 'review', 'delivered'].includes(p.status) ? p.budget : 0), 0);
-  
-  // Filter projects for display: show rejected ones only for 3 days
-  const displayProjects = projects.filter(p => {
-    if (p.status === 'rejected') {
-      const createdDate = new Date(p.created_at);
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-      return createdDate > threeDaysAgo;
+  const fetchProjects = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('student_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
     }
-    return true;
-  });
+  };
+
+  const stats = {
+    total: projects.length,
+    active: projects.filter(p => ['accepted', 'in_development'].includes(p.status)).length,
+    pending: projects.filter(p => p.status === 'pending').length,
+    delivered: projects.filter(p => p.status === 'delivered').length
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <motion.h1 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-heading font-bold"
-          >
-            Hey {profile?.full_name?.split(' ')[0] || 'Student'}, what are we building?
-          </motion.h1>
-          <p className="text-text-muted mt-1">Manage your active projects and requests.</p>
+          <h1 className="text-3xl font-heading font-black flex items-center gap-3">
+            Service Console
+            <span className="text-[10px] font-mono font-bold px-2 py-1 rounded bg-primary/10 text-primary uppercase tracking-[0.2em] border border-primary/20">Active</span>
+          </h1>
+          <p className="text-text-muted mt-1 font-mono text-xs uppercase tracking-widest">Node ID: SYN-USR-{user?.id.slice(0, 4)} // SECURE CONNECTED</p>
         </div>
         <Link to="/new-project">
-          <Button variant="glow" className="gap-2">
-            <Plus className="w-4 h-4" /> New Project
+          <Button size="lg" className="gap-2 font-bold px-8 shadow-lg shadow-primary/10">
+            <Plus className="w-4 h-4" /> New Deployment
           </Button>
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { title: 'Total Requests', value: projects.length, icon: Terminal, color: 'text-primary' },
-          { title: 'Active Builds', value: activeProjects, icon: Clock, color: 'text-blue-500' },
-          { title: 'Delivered', value: deliveredCount, icon: CheckCircle, color: 'text-green-500' },
-          { title: 'Total Spent', value: `₹${totalSpent}`, icon: IndianRupee, color: 'text-purple-500' },
+          { label: 'ACTIVE NODES', value: stats.total, icon: FileText, color: 'text-primary' },
+          { label: 'VERIFIED', value: stats.active, icon: CheckCircle, color: 'text-success' },
+          { label: 'PENDING', value: stats.pending, icon: Clock, color: 'text-warning' },
+          { label: 'COMPLETED', value: stats.delivered, icon: CheckCircle, color: 'text-primary' },
         ].map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: i * 0.1 }}
-          >
-            <Card className="bg-surface/50 border-border/50">
-              <CardContent className="p-6 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-text-muted mb-1">{stat.title}</p>
-                  <h3 className="text-2xl font-mono font-bold">{stat.value}</h3>
-                </div>
-                <div className={`p-3 rounded-full bg-background ${stat.color}`}>
-                  <stat.icon className="w-6 h-6" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+          <Card key={i} className="bg-surface border-border hover:border-primary/20 transition-all group p-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[10px] font-mono font-bold text-text-muted uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+                <h3 className="text-3xl font-black font-mono">{stat.value}</h3>
+              </div>
+              <div className={`p-2 rounded-lg bg-background border border-border group-hover:border-primary/20 ${stat.color} transition-all`}>
+                <stat.icon className="w-5 h-5" />
+              </div>
+            </div>
+          </Card>
         ))}
       </div>
 
-      <div className="space-y-6">
-        <h2 className="text-xl font-heading font-semibold">My Projects</h2>
-        
-        {isLoading ? (
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-24 bg-surface rounded-xl border border-border/50" />
-            ))}
+      {/* Main Content Areas */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Projects List */}
+        <div className="lg:col-span-2 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              Deployment Pipeline
+            </h2>
           </div>
-        ) : projects.length === 0 ? (
-          <Card className="bg-surface/30 border-dashed border-border text-center py-12">
-            <CardContent>
-              <div className="w-16 h-16 rounded-full bg-surface mx-auto flex items-center justify-center mb-4">
-                <Terminal className="w-8 h-8 text-text-muted" />
+
+          <div className="flex flex-col gap-3">
+            {loading ? (
+              <div className="h-64 flex items-center justify-center bg-surface/50 rounded-xl border border-border border-dashed font-mono text-xs text-text-muted">
+                FETCHING DATA...
               </div>
-              <h3 className="text-lg font-medium mb-2">No projects yet</h3>
-              <p className="text-text-muted mb-6">Start your first project to get a free quote.</p>
-              <Link to="/new-project">
-                <Button variant="outline">Create Project</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4">
-            {displayProjects.map((project, i) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
-              >
-                <Link to={`/projects/${project.id}`}>
-                  <Card hoverable className="bg-surface/50 border-border/50 transition-colors hover:bg-surface">
-                    <CardContent className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-heading font-semibold text-lg">{project.title}</h3>
-                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                            project.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                            project.status === 'accepted' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                            project.status === 'rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                            project.status === 'in_development' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20 animate-pulse' :
-                            project.status === 'delivered' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                            'bg-surface text-text-muted border-border'
-                          }`}>
-                            {project.status.replace('_', ' ').toUpperCase()}
-                          </span>
+            ) : projects.length > 0 ? (
+              projects.map((project) => (
+                <Link key={project.id} to={`/project/${project.id}`}>
+                  <Card className="bg-surface border-border hover:border-primary/30 transition-all p-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-background border border-border flex items-center justify-center text-text-muted">
+                          <Terminal className="w-5 h-5 text-primary/60" />
                         </div>
-                        <p className="text-sm text-text-muted line-clamp-1 mb-3">{project.description}</p>
-                        
-                        {project.admin_notes && (
-                          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
-                            <h4 className="text-[10px] font-mono uppercase text-primary mb-1">Update from Admin</h4>
-                            <p className="text-xs text-text-primary italic leading-relaxed">"{project.admin_notes}"</p>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-6 text-sm">
-                        <div className="text-right hidden sm:block">
-                          <p className="text-text-muted mb-1">Domain</p>
-                          <p className="font-medium">{project.domain}</p>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-sm truncate uppercase tracking-tight text-text-primary">{project.title}</h4>
+                          <p className="text-[10px] text-text-muted font-mono mt-0.5">{project.id.slice(0, 8)} // {new Date(project.created_at).toLocaleDateString()}</p>
                         </div>
                       </div>
-                    </CardContent>
+                      
+                      <div className="flex items-center gap-6 shrink-0">
+                        <div className="hidden md:block text-right">
+                          <p className="text-[10px] text-text-muted font-mono uppercase tracking-widest mb-0.5">Budget</p>
+                          <p className="font-bold text-sm text-text-primary">₹{project.budget}</p>
+                        </div>
+                        <span className={cn(
+                          "px-3 py-1 rounded-full text-[9px] font-mono font-bold uppercase tracking-widest border",
+                          project.status === 'delivered' ? "bg-success/5 text-success border-success/20" :
+                          project.status === 'pending' ? "bg-warning/5 text-warning border-warning/20" :
+                          "bg-primary/5 text-primary border-primary/20"
+                        )}>
+                          {project.status.replace(/_/g, ' ')}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-text-muted" />
+                      </div>
+                    </div>
                   </Card>
                 </Link>
-              </motion.div>
-            ))}
+              ))
+            ) : (
+              <Card className="p-12 text-center bg-surface border-border border-dashed">
+                <p className="text-text-muted font-mono text-sm uppercase tracking-widest">No active deployments detected.</p>
+                <Link to="/new-project" className="mt-4 inline-block">
+                  <Button variant="outline" className="text-xs uppercase font-bold tracking-widest">Initiate Project</Button>
+                </Link>
+              </Card>
+            )}
           </div>
-        )}
+        </div>
+
+        {/* Sidebar Cards */}
+        <div className="flex flex-col gap-4">
+          <h2 className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+            System Briefing
+          </h2>
+          
+          <Card className="p-6 bg-surface border-border">
+            <h3 className="font-bold text-xs uppercase tracking-widest mb-4">Latest Briefings</h3>
+            <div className="space-y-4">
+              {[
+                { title: 'Project Verified', time: '2h ago', body: 'Deployment established by admin' },
+                { title: 'New Commits', time: '5h ago', body: 'Source code pushed for active node' },
+                { title: 'System Patch', time: '1d ago', body: 'V3.2 Engine components updated' },
+              ].map((note, i) => (
+                <div key={i} className="flex gap-3">
+                  <div className="w-0.5 bg-primary/20 rounded-full" />
+                  <div>
+                    <h4 className="text-[11px] font-bold text-text-primary uppercase tracking-tight">{note.title}</h4>
+                    <p className="text-[10px] text-text-muted mt-0.5 leading-relaxed">{note.body}</p>
+                    <span className="text-[8px] font-mono text-text-muted uppercase mt-1 block">{note.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-6 bg-elevated border border-primary/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-all" />
+            <h3 className="font-bold text-xs uppercase tracking-widest mb-2 relative z-10 text-primary">Technical Support</h3>
+            <p className="text-[11px] text-text-muted mb-4 relative z-10 font-mono italic">Access high-priority internal support channels.</p>
+            <Button size="sm" variant="outline" className="w-full text-[10px] font-mono tracking-widest relative z-10 hover:border-primary/50">OPEN CHANNEL</Button>
+          </Card>
+        </div>
       </div>
     </div>
   );

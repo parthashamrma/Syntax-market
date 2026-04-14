@@ -6,7 +6,8 @@ import { useAuthStore } from '@/src/store/authStore';
 import { Button } from '@/src/components/ui/Button';
 import { Input } from '@/src/components/ui/Input';
 import { Label } from '@/src/components/ui/Label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/Card';
+import { Card } from '@/src/components/ui/Card';
+import { Terminal, User, BookOpen, School, Activity } from 'lucide-react';
 
 export function Profile() {
   const { user, profile, setProfile } = useAuthStore();
@@ -50,62 +51,83 @@ export function Profile() {
       navigate('/dashboard');
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Failed to update profile');
+      alert('SYNC_FAILURE: Failed to update node operator profile.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-xl"
       >
-        <Card className="bg-surface/50 border-border/50">
-          <CardHeader>
-            <CardTitle className="text-2xl font-heading">Complete Your Profile</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSave} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+        <Card className="p-10 bg-surface border-border backdrop-blur-xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          
+          <div className="flex flex-col items-center text-center mb-10">
+            <div className="p-4 rounded-xl bg-background border border-border text-primary mb-6 shadow-inner group-hover:border-primary/20 transition-all">
+              <User className="w-8 h-8" />
+            </div>
+            <h1 className="text-2xl font-heading font-black uppercase tracking-tight text-text-primary">Operator Profile</h1>
+            <p className="text-[10px] font-mono text-text-muted mt-2 uppercase tracking-[0.2em] font-bold">CONFIGURE_SYNC_METADATA // NODE: {user?.id.slice(0, 8)}</p>
+          </div>
+
+          <form onSubmit={handleSave} className="space-y-8">
+            <div className="space-y-3">
+              <Label className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted">Full_Legal_Name</Label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                 <Input 
-                  id="fullName" 
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  placeholder="John Doe"
+                  placeholder="OPERATOR_NAME"
+                  className="pl-12 h-14 bg-background border-border focus:border-primary text-text-primary font-mono text-xs uppercase"
                 />
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="college">College / University</Label>
+            </div>
+            
+            <div className="space-y-3">
+              <Label className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted">University_Base</Label>
+              <div className="relative">
+                <School className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                 <Input 
-                  id="college" 
                   value={college}
                   onChange={(e) => setCollege(e.target.value)}
                   required
-                  placeholder="e.g. MIT, Stanford, IIT"
+                  placeholder="e.g. VIT_VELLORE, MIT_MANIPAL"
+                  className="pl-12 h-14 bg-background border-border focus:border-primary text-text-primary font-mono text-xs uppercase"
                 />
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="course">Course</Label>
+            </div>
+            
+            <div className="space-y-3">
+              <Label className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted">Academic_Program</Label>
+              <div className="relative">
+                <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                 <Input 
-                  id="course" 
                   value={course}
                   onChange={(e) => setCourse(e.target.value)}
                   required
-                  placeholder="e.g. B.Tech CS, BCA, MCA"
+                  placeholder="e.g. B_TECH_CS, MCA_2024"
+                  className="pl-12 h-14 bg-background border-border focus:border-primary text-text-primary font-mono text-xs uppercase"
                 />
               </div>
-              
-              <Button type="submit" variant="glow" className="w-full" disabled={loading}>
-                {loading ? 'Saving...' : 'Save Profile'}
-              </Button>
-            </form>
-          </CardContent>
+            </div>
+            
+            <Button type="submit" className="w-full h-14 text-[11px] font-mono font-bold uppercase tracking-[0.2em] mt-4" disabled={loading}>
+              {loading ? (
+                <span className="flex items-center gap-3">
+                  <Activity className="w-4 h-4 animate-spin" />
+                  SYNCING_OPERATOR_DATA
+                </span>
+              ) : 'Commit_Profile_Configuration'}
+            </Button>
+          </form>
         </Card>
       </motion.div>
     </div>

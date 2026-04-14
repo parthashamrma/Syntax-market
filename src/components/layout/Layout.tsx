@@ -1,12 +1,8 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useAuthStore } from '@/src/store/authStore';
 import { Button } from '@/src/components/ui/Button';
-import { Terminal, Menu, X, Settings, User as UserIcon, Activity } from 'lucide-react';
-import { NotificationBell } from './NotificationBell';
+import { Terminal, Settings, User as UserIcon, Activity, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/src/lib/supabase';
-import { motion } from 'framer-motion';
-
 import { Sidebar } from './Sidebar';
 
 export function Layout() {
@@ -23,7 +19,7 @@ export function Layout() {
 
   return (
     <div className="min-h-screen bg-background text-text-primary cursor-default flex">
-      {/* Sidebar - Only show for authenticated users, always expanded 240px */}
+      {/* Sidebar - Only show for authenticated users */}
       {user && <Sidebar />}
 
       <div className={`flex flex-col flex-1 transition-all duration-300 ${user ? 'ml-[240px]' : ''}`}>
@@ -32,18 +28,20 @@ export function Layout() {
             user ? 'left-[240px]' : 'left-0'
           } ${
             scrolled 
-              ? 'backdrop-blur-xl bg-black/80 border-b border-primary/30' 
-              : 'backdrop-blur-md bg-black/60 border-b border-border'
+              ? 'backdrop-blur-xl bg-[#0B0F14]/80 border-b border-primary/20 shadow-sm' 
+              : 'backdrop-blur-md bg-transparent border-b border-border'
           }`}
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 relative">
               {/* Left: Branding */}
               <div className="flex items-center">
                 {!user ? (
                   <Link to="/" className="flex items-center space-x-2 group">
-                    <Terminal className="w-6 h-6 text-primary" />
-                    <span className="font-mono font-bold text-lg tracking-tight text-white">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-all">
+                      <Terminal className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="font-mono font-bold text-lg tracking-tight text-text-primary">
                       Syntax.market
                     </span>
                   </Link>
@@ -58,9 +56,12 @@ export function Layout() {
               {/* Center: Engine Status (Always visible for Guest) */}
               {!user && (
                 <div className="absolute left-1/2 -translate-x-1/2 hidden md:block">
-                  <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 shadow-[0_0_15px_rgba(124,58,237,0.1)]">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse-purple" />
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-primary">⚡ Engine Live</span>
+                  <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface border border-border shadow-sm">
+                    <div className="relative flex h-2 w-2">
+                       <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-40" />
+                       <div className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-text-muted hover:text-primary transition-colors cursor-default">⚡ Engine Live</span>
                   </div>
                 </div>
               )}
@@ -69,11 +70,11 @@ export function Layout() {
               <nav className="flex items-center space-x-4">
                 {!user ? (
                   <div className="flex items-center space-x-3">
-                    <Link to="/signup">
-                      <Button variant="outline" className="h-9 px-4 border-white/10 text-xs font-semibold hover:bg-white/5">Sign Up</Button>
-                    </Link>
                     <Link to="/login">
-                      <Button variant="glow" className="h-9 px-5 text-xs font-semibold">Login</Button>
+                      <Button variant="ghost" className="h-9 px-4 text-xs font-semibold">Sign In</Button>
+                    </Link>
+                    <Link to="/signup">
+                      <Button className="h-9 px-5 text-xs font-bold bg-primary text-[#0B0F14] hover:bg-primary-hover shadow-lg shadow-primary/10">Join Now</Button>
                     </Link>
                   </div>
                 ) : (
@@ -84,40 +85,50 @@ export function Layout() {
               </nav>
             </div>
           </div>
+
+          {/* Marquee Ticker - Minimal Technical style */}
+          {!user && (
+            <div className="bg-[#0B0F14] border-t border-border py-2 overflow-hidden select-none">
+              <div className="flex whitespace-nowrap animate-marquee">
+                {[1, 2, 3, 4].map((group) => (
+                  <div key={group} className="flex gap-12 items-center px-12">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[9px] font-bold text-text-muted uppercase tracking-[0.2em] font-mono">Face Recognition delivered</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[9px] font-bold text-text-muted uppercase tracking-[0.2em] font-mono">E-Commerce App delivered</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[9px] font-bold text-text-muted uppercase tracking-[0.2em] font-mono">Chat App delivered</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[9px] font-bold text-text-muted uppercase tracking-[0.2em] font-mono">Library System delivered</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </header>
 
-        {/* Live Ticker Bar - Redesigned */}
-        <div 
-          className={`fixed top-16 right-0 z-40 transition-all duration-300 bg-[#111111] border-y border-white/5 overflow-hidden h-9 flex items-center ${
-            user ? 'left-[240px]' : 'left-0'
-          }`}
-        >
-          <div className="whitespace-nowrap animate-marquee flex items-center space-x-12 text-[10px] font-mono text-text-muted uppercase tracking-widest">
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className="flex items-center space-x-12">
-                <span className="flex items-center gap-2"><span className="text-primary font-bold text-xs italic">✓</span> Face Recognition System delivered</span>
-                <span className="flex items-center gap-2"><span className="text-primary font-bold text-xs italic">✓</span> E-Commerce App delivered</span>
-                <span className="flex items-center gap-2"><span className="text-primary font-bold text-xs italic">✓</span> Chat App delivered</span>
-                <span className="flex items-center gap-2"><span className="text-primary font-bold text-xs italic">✓</span> Library Management System delivered</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <main className="flex-grow pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <main className={`flex-grow ${user ? 'pt-24' : 'pt-32'} pb-12 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto w-full`}>
           <Outlet />
         </main>
 
         <footer className="bg-surface/30 border-t border-border py-8 mt-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
               <Terminal className="w-5 h-5 text-text-muted" />
               <span className="font-heading font-semibold text-text-muted">Syntax.market</span>
             </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-text-muted hover:text-white text-sm">Terms</a>
-              <a href="#" className="text-text-muted hover:text-white text-sm">Privacy</a>
-              <p className="text-text-muted text-xs">© 2024 Built with ❤️ for Students</p>
+            <div className="flex space-x-6 items-center">
+              <a href="#" className="text-text-muted hover:text-primary transition-colors text-xs uppercase tracking-widest font-mono">Terms</a>
+              <a href="#" className="text-text-muted hover:text-primary transition-colors text-xs uppercase tracking-widest font-mono">Privacy</a>
+              <p className="text-text-muted text-[10px] font-mono border-l border-border pl-6 ml-6">© 2024 BUILT FOR THE NEXT GEN</p>
             </div>
           </div>
         </footer>

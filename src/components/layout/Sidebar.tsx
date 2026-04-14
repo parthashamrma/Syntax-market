@@ -28,7 +28,7 @@ export function Sidebar() {
 
   return (
     <div 
-      className="fixed left-0 top-0 h-screen w-[240px] bg-[#0d0d0d] border-r border-[#1a1a1a] z-50 flex flex-col"
+      className="fixed left-0 top-0 h-screen w-[240px] bg-[#0D1117] border-r border-border z-50 flex flex-col"
     >
       {/* 1. Logo Section (Top) - Non-clickable */}
       <div className="p-6 mb-2">
@@ -36,7 +36,7 @@ export function Sidebar() {
           <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
             <Terminal className="w-5 h-5 text-primary" />
           </div>
-          <span className="font-mono font-bold text-lg tracking-tight whitespace-nowrap text-white">
+          <span className="font-mono font-bold text-lg tracking-tight whitespace-nowrap text-text-primary">
             Syntax.market
           </span>
         </div>
@@ -52,17 +52,17 @@ export function Sidebar() {
               to={item.path}
               className={`group flex items-center gap-3 px-4 py-3 rounded-lg transition-all relative ${
                 isActive 
-                  ? 'bg-primary/10 text-primary' 
-                  : 'text-text-muted hover:text-white hover:bg-white/5'
+                  ? 'bg-primary/5 text-primary' 
+                  : 'text-text-muted hover:text-text-primary hover:bg-white/5'
               }`}
             >
-              <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-primary' : 'group-hover:text-primary transition-colors'}`} />
+              <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-primary' : 'group-hover:text-primary/70 transition-colors'}`} />
               <span className="font-medium text-sm">
                 {item.label}
               </span>
               {isActive && (
                 <div 
-                  className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
+                  className="absolute left-0 w-1 h-5 bg-primary rounded-r-full"
                 />
               )}
             </Link>
@@ -71,8 +71,8 @@ export function Sidebar() {
       </nav>
 
       {/* 3. Bottom Section - User Profile Card */}
-      <div className="p-4 mt-auto border-t border-[#1a1a1a]">
-        <div className="p-3 mb-2 rounded-xl bg-surface/50 border border-border/50 flex items-center gap-3 overflow-hidden">
+      <div className="p-4 mt-auto border-t border-border">
+        <div className="p-3 mb-2 rounded-xl bg-surface border border-border/50 flex items-center gap-3 overflow-hidden shadow-sm">
           <div className="w-9 h-9 rounded-full bg-background border border-border flex items-center justify-center overflow-hidden flex-shrink-0">
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
@@ -82,7 +82,7 @@ export function Sidebar() {
           </div>
           
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate">{profile?.full_name || 'User'}</p>
+            <p className="text-xs font-bold text-text-primary truncate">{profile?.full_name || 'User'}</p>
             <p className="text-[9px] text-text-muted uppercase tracking-widest font-mono">
               {isAdmin ? 'ADMIN' : 'CLIENT'}
             </p>
@@ -95,7 +95,7 @@ export function Sidebar() {
 
         <button 
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-text-muted hover:text-red-400 hover:bg-red-400/5 mt-1"
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-text-muted hover:text-danger hover:bg-danger/5 mt-1"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
           <span className="font-medium text-sm">Logout</span>

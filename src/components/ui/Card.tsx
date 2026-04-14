@@ -6,10 +6,10 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   ({ className, hoverable = false, ...props }, ref) => (
     <motion.div
       ref={ref}
-      whileHover={hoverable ? { scale: 1.02, boxShadow: "0 0 15px rgba(124,58,237,0.4)" } : undefined}
+      whileHover={hoverable ? { y: -4, boxShadow: "0 8px 30px rgba(94,230,255,0.12)" } : undefined}
       transition={{ duration: 0.2 }}
       className={cn(
-        "rounded-xl border border-border bg-surface text-text-primary shadow",
+        "rounded-xl border border-border bg-surface text-text-primary",
         className
       )}
       {...props}

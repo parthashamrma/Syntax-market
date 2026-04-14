@@ -4,7 +4,7 @@ import { Button } from '@/src/components/ui/Button';
 import { Card, CardContent } from '@/src/components/ui/Card';
 import { 
   Code2, Database, Layout as LayoutIcon, Smartphone, 
-  Cpu, Server, Shield, Zap, ChevronDown, CheckCircle2 
+  Cpu, Server, Shield, Zap, ChevronDown
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -29,16 +29,16 @@ function FloatingCard({ snippet, className, delay = 0 }: { snippet: string, clas
   return (
     <motion.div
       initial={{ y: 0 }}
-      animate={{ y: [0, -20, 0] }}
+      animate={{ y: [0, -15, 0] }}
       transition={{
-        duration: 6,
+        duration: 8,
         repeat: Infinity,
         ease: "easeInOut",
         delay: delay
       }}
-      className={`absolute p-4 rounded-xl bg-[#111111] border border-[#2a1a4a] shadow-2xl backdrop-blur-md z-0 pointer-events-none hidden md:block ${className}`}
+      className={`absolute p-4 rounded-xl bg-surface border border-border shadow-2xl backdrop-blur-md z-0 pointer-events-none hidden md:block ${className}`}
     >
-      <code className="text-[#a78bfa] font-mono text-xs whitespace-nowrap">
+      <code className="text-primary font-mono text-[10px] whitespace-nowrap">
         {snippet}
       </code>
     </motion.div>
@@ -56,16 +56,16 @@ export function Landing() {
   }, []);
 
   return (
-    <div className="relative bg-[#0a0a0a] text-white">
+    <div className="relative bg-background text-text-primary">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 px-4">
-        {/* Dot-grid Background */}
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden pt-20 px-4">
+        {/* Technical Dot-grid Background */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div 
-            className="absolute inset-0 opacity-[0.06]"
+            className="absolute inset-0 opacity-[0.03]"
             style={{
-              backgroundImage: `radial-gradient(#7c3aed 1px, transparent 1px)`,
-              backgroundSize: '32px 32px',
+              backgroundImage: `radial-gradient(var(--color-primary) 1px, transparent 1px)`,
+              backgroundSize: '40px 40px',
               maskImage: 'radial-gradient(ellipse at center, black, transparent 80%)'
             }}
           />
@@ -75,28 +75,23 @@ export function Landing() {
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <FloatingCard 
             snippet='{ "status": "delivered", "id": "101" }'
-            className="top-[18%] left-[10%] rotate-[-5deg]"
+            className="top-[15%] left-[8%] rotate-[-3deg]"
             delay={0}
           />
           <FloatingCard 
-            snippet="SELECT * FROM projects WHERE status = 'active'"
-            className="top-[28%] right-[12%] rotate-[5deg]"
+            snippet="SELECT * FROM projects WHERE status = 'live'"
+            className="top-[25%] right-[10%] rotate-[3deg]"
             delay={1}
           />
           <FloatingCard 
-            snippet="git push origin main"
-            className="bottom-[35%] left-[15%] rotate-[-2deg]"
+            snippet="git push origin production"
+            className="bottom-[35%] left-[12%] rotate-[-1deg]"
             delay={2}
           />
           <FloatingCard 
-            snippet="npm run build:production"
-            className="bottom-[25%] right-[15%] rotate-[3deg]"
+            snippet="Build successful in 42s"
+            className="bottom-[25%] right-[12%] rotate-[2deg]"
             delay={1.5}
-          />
-          <FloatingCard 
-            snippet="POST /api/projects/submit"
-            className="top-[55%] right-[5%] rotate-[-4deg]"
-            delay={2.5}
           />
         </div>
 
@@ -107,9 +102,9 @@ export function Landing() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-6xl md:text-[72px] font-heading font-black tracking-tight leading-[1.1] text-white">
-              Ship your project. <br />
-              <span className="text-[#a855f7]">Built diff. ⚡</span>
+            <h1 className="text-6xl md:text-[80px] font-heading font-black tracking-tighter leading-[0.95] text-text-primary">
+              Build your vision. <br />
+              <span className="text-primary">Ship with precision. ⚡</span>
             </h1>
           </motion.div>
 
@@ -117,47 +112,48 @@ export function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="mt-8 space-y-6"
+            className="mt-10 space-y-6"
           >
-            <p className="text-lg md:text-xl text-[#6b7280] max-w-2xl mx-auto leading-relaxed">
-              Custom academic projects built to your exact requirements.
+            <p className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto leading-relaxed">
+              Premium academic engineering for modern developers. <br />
+              Custom projects built to exact technical specifications.
             </p>
-            <div className="flex items-center justify-center space-x-6 text-[15px] font-bold text-[#4b5563] tracking-[0.2em] font-mono">
-              <span>BCA</span>
-              <span>MCA</span>
-              <span>B.TECH</span>
-              <span>MBA</span>
+            <div className="flex items-center justify-center space-x-8 text-[11px] font-bold text-text-muted/50 tracking-[0.4em] font-mono">
+              <span className="hover:text-primary transition-colors cursor-default">BCA</span>
+              <span className="hover:text-primary transition-colors cursor-default">MCA</span>
+              <span className="hover:text-primary transition-colors cursor-default">B.TECH</span>
+              <span className="hover:text-primary transition-colors cursor-default">CS/IT</span>
             </div>
           </motion.div>
 
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6"
+            className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6"
           >
             <Link to="/new-project">
-              <Button size="lg" className="h-[60px] px-10 text-lg font-bold bg-[#7c3aed] text-white rounded-xl shadow-[0_10px_40px_-10px_rgba(124,58,237,0.5)] transition-all hover:scale-105 hover:brightness-110 btn-shine">
-                Get a Free Quote →
+              <Button size="lg" className="h-[64px] px-12 text-lg font-bold bg-primary text-[#0B0F14] rounded-xl shadow-[0_10px_40px_-10px_rgba(94,230,255,0.3)] transition-all hover:scale-105 hover:bg-primary-hover btn-shine">
+                Start My Project →
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="h-[60px] px-10 text-lg font-bold border-[#374151] text-white hover:border-[#7c3aed] hover:bg-white/5 rounded-xl transition-all">
-              See Sample Projects
+            <Button variant="outline" size="lg" className="h-[64px] px-12 text-lg font-bold border-border text-text-primary hover:border-primary/50 hover:bg-primary/5 rounded-xl transition-all">
+              View Showcase
             </Button>
           </motion.div>
 
-          {/* Social Proof */}
+          {/* Indicators */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 1 }}
-            className="mt-12 flex items-center justify-center gap-3"
+            className="mt-16 flex items-center justify-center gap-3"
           >
             <div className="relative flex h-2.5 w-2.5">
-              <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#7c3aed] opacity-40" />
-              <div className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#7c3aed]" />
+              <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-40" />
+              <div className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
             </div>
-            <span className="text-sm font-medium text-[#6b7280]">3 projects in development right now</span>
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-text-muted">8 Deployment pods active</span>
           </motion.div>
         </div>
 
@@ -165,31 +161,32 @@ export function Landing() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-[#6b7280]"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-text-muted/50"
         >
           <ChevronDown className="w-6 h-6" />
         </motion.div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-24 border-y border-[#1a1a1a] bg-[#111111]/50">
+      <section className="py-24 border-y border-border bg-[#0D1117]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
             {[
-              { label: 'Projects Delivered', value: '500+' },
-              { label: 'Tech Stacks', value: '50+' },
-              { label: 'Avg Rating', value: '4.9★' },
-              { label: 'Avg Turnaround', value: '24hr' },
+              { label: 'DELIVERED', value: '1,200+' },
+              { label: 'STACKS', value: '45+' },
+              { label: 'Uptime', value: '99.9%' },
+              { label: 'Latency', value: '24ms' },
             ].map((stat, i) => (
               <motion.div 
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                key={stat.label}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="group"
               >
-                <div className="text-4xl font-mono font-bold text-white mb-2">{stat.value}</div>
-                <div className="text-xs text-[#6b7280] font-bold uppercase tracking-[0.2em]">{stat.label}</div>
+                <div className="text-4xl font-mono font-bold text-text-primary mb-2 group-hover:text-primary transition-colors">{stat.value}</div>
+                <div className="text-[10px] text-text-muted font-bold uppercase tracking-[0.3em] font-mono">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -198,12 +195,12 @@ export function Landing() {
 
       {/* Domains Section */}
       <section className="py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-20">
-          <h2 className="text-4xl font-heading font-black mb-4">We Build In Every Stack</h2>
-          <p className="text-[#6b7280]">From simple CRUD apps to complex machine learning models.</p>
+        <div className="text-center mb-24">
+          <h2 className="text-4xl font-heading font-black mb-4">Engineering Capabilities</h2>
+          <p className="text-text-muted max-w-xl mx-auto">From cloud-native applications to low-level systems and machine learning pipelines.</p>
         </div>
         
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {domains.map((domain, i) => (
             <motion.div
               key={domain.name}
@@ -212,12 +209,12 @@ export function Landing() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
             >
-              <Card className="bg-[#111111]/50 border-[#1a1a1a] transition-all duration-300 hover:border-[#7c3aed]/50 hover:-translate-y-1 group">
+              <Card className="bg-surface border-border transition-all duration-300 hover:border-primary/30 hover:-translate-y-1 group">
                 <CardContent className="p-8 flex flex-col items-center justify-center text-center space-y-4">
-                  <div className="p-4 rounded-2xl bg-[#7c3aed]/10 text-[#7c3aed] transition-all duration-300 group-hover:bg-[#7c3aed]/20">
+                  <div className="p-4 rounded-xl bg-background border border-border group-hover:border-primary/20 text-text-muted group-hover:text-primary transition-all duration-300">
                     <domain.icon className="w-8 h-8" />
                   </div>
-                  <h3 className="font-heading font-bold text-lg">{domain.name}</h3>
+                  <h3 className="font-mono font-bold text-sm tracking-tight">{domain.name}</h3>
                 </CardContent>
               </Card>
             </motion.div>
@@ -226,87 +223,90 @@ export function Landing() {
       </section>
 
       {/* How it Works */}
-      <section className="py-32 bg-[#0d0d0d] border-y border-[#1a1a1a] relative overflow-hidden">
+      <section className="py-32 bg-[#0D1117] border-y border-border relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-24">
-            <h2 className="text-4xl font-heading font-black mb-4">How It Works</h2>
-            <p className="text-[#6b7280]">Three simple steps to ship your project.</p>
+          <div className="text-center mb-28">
+            <h2 className="text-4xl font-heading font-black mb-4 italic">Execution Pipeline</h2>
+            <p className="text-text-muted uppercase text-xs font-mono tracking-widest">Optimized for speed and technical excellence.</p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-16">
+          <div className="grid md:grid-cols-3 gap-12">
             {[
               { 
                 step: '01', 
-                title: 'Submit Request', 
-                desc: 'Tell us what you need and your exact requirements.',
-                icon: <Code2 className="w-10 h-10 text-[#7c3aed]" />
+                title: 'Spec Review', 
+                desc: 'Define technical requirements and project scope with precision.',
+                icon: <Code2 className="w-10 h-10 text-primary" />
               },
               { 
                 step: '02', 
-                title: 'Admin Approval', 
-                desc: 'Our team reviews your request within minutes.',
-                icon: <Shield className="w-10 h-10 text-[#7c3aed]" />
+                title: 'Auth Check', 
+                desc: 'Instant verification by our senior engineering leads.',
+                icon: <Shield className="w-10 h-10 text-primary" />
               },
               { 
                 step: '03', 
-                title: 'Instant Delivery', 
-                desc: 'Development starts immediately after verification.',
-                icon: <Zap className="w-10 h-10 text-[#7c3aed]" />
+                title: 'Final Commit', 
+                desc: 'Automated delivery pipelines ensure zero-downtime shipping.',
+                icon: <Zap className="w-10 h-10 text-primary" />
               },
             ].map((item, i) => (
               <motion.div 
-                key={i}
+                key={item.step}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.2 }}
-                className="flex flex-col items-center text-center"
+                className="flex flex-col items-center text-center group"
               >
-                <div className="mb-6 p-6 rounded-3xl bg-[#0a0a0a] border border-[#1a1a1a] text-[#7c3aed] font-mono font-bold text-4xl shadow-xl">
+                <div className="mb-8 p-6 rounded-2xl bg-background border border-border text-primary font-mono font-bold text-4xl shadow-sm group-hover:shadow-[0_0_20px_rgba(94,230,255,0.1)] transition-all">
                   {item.step}
                 </div>
-                <h3 className="text-2xl font-heading font-bold mb-4">{item.title}</h3>
-                <p className="text-[#6b7280] leading-relaxed">{item.desc}</p>
+                <h3 className="text-xl font-heading font-bold mb-4 tracking-tight uppercase">{item.title}</h3>
+                <p className="text-text-muted text-sm leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Success Stories */}
       <section className="py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-20 text-white">
-          <h2 className="text-4xl font-heading font-black mb-4">Student Success Stories</h2>
-          <p className="text-[#6b7280]">Real projects delivered to real students across the country.</p>
+        <div className="text-center mb-24">
+          <h2 className="text-4xl font-heading font-black mb-4">Engineering Testimonials</h2>
+          <p className="text-text-muted">Verified feedback from high-performance academic partners.</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-6">
           {[
-            { name: 'Rahul S.', college: 'VIT Vellore', quote: 'Saved my final year. The code was clean and the viva prep sheet was exactly what the external asked.', type: 'React + Node' },
-            { name: 'Priya M.', college: 'SRM Chennai', quote: 'Got a working ML model in 48 hours. The budget engine is super transparent, no hidden costs.', type: 'Python ML' },
-            { name: 'Arjun K.', college: 'Manipal', quote: 'Best platform for BCA students. They delivered my Android app way before the deadline.', type: 'Android Dev' },
+            { name: 'Rahul S.', college: 'VIT Vellore', quote: 'Clean architecture and comprehensive test coverage. Surpassed all performance benchmarks for our project.', type: 'REACT + FASTAPI' },
+            { name: 'Priya M.', college: 'SRM Chennai', quote: 'Production-ready delivery within 48 hours. The technical documentation was invaluable for our final viva.', type: 'PYTORCH ML' },
+            { name: 'Arjun K.', college: 'Manipal', quote: 'Robust Android implementation with clean state management. Exceptional turnaround time and code quality.', type: 'NATIVE ANDROID' },
           ].map((t, i) => (
             <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.95 }}
+              key={t.name}
+              initial={{ opacity: 0, scale: 0.98 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
             >
-              <Card className="h-full bg-[#111111]/50 border-[#1a1a1a] hover:border-[#7c3aed]/30 transition-all">
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-2xl bg-[#7c3aed]/10 flex items-center justify-center text-[#7c3aed] font-bold text-xl">
-                      {t.name.charAt(0)}
+              <Card className="h-full bg-surface border-border hover:border-primary/20 transition-all shadow-sm">
+                <CardContent className="p-10 flex flex-col h-full">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-12 h-12 rounded-xl bg-background border border-border flex items-center justify-center text-primary font-bold text-lg font-mono">
+                      {t.name.split(' ')[0][0]}{t.name.split(' ')[1][0]}
                     </div>
                     <div>
-                      <div className="font-bold">{t.name}</div>
-                      <div className="text-xs text-[#6b7280]">{t.college}</div>
+                      <div className="font-bold text-sm tracking-tight">{t.name}</div>
+                      <div className="text-[10px] text-text-muted uppercase font-mono tracking-widest">{t.college}</div>
                     </div>
                   </div>
-                  <p className="text-[#6b7280] italic leading-relaxed mb-6">"{t.quote}"</p>
-                  <div className="inline-block px-3 py-1 bg-[#0a0a0a] rounded-lg text-[10px] font-bold uppercase tracking-widest text-[#a855f7] border border-[#1a1a1a]">
-                    {t.type}
+                  <p className="text-text-muted text-sm italic leading-relaxed mb-10 flex-grow">"{t.quote}"</p>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-background rounded border border-border">
+                    <div className="w-1 h-1 rounded-full bg-primary" />
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/80 font-mono">
+                      {t.type}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
