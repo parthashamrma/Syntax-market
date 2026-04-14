@@ -7,6 +7,7 @@ import { Input } from '@/src/components/ui/Input';
 import { Label } from '@/src/components/ui/Label';
 import { Terminal, Eye, EyeOff, Mail, Lock, ArrowLeft, Github, Activity, Shield } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { Card } from '@/src/components/ui/Card';
 
 export function Login() {
   const [email, setEmail] = useState('');
