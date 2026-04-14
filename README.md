@@ -1,97 +1,124 @@
-# Syntax.market
+# 🚀 Syntax.market
 
-On-Demand Student Project Platform
+**High-Fidelity Project Engine for Modern Students**
 
-## Setup Instructions
+Syntax.market is a premium on-demand platform designed to bridge the gap between academic requirements and professional-grade software development. Built with a focus on speed, quality, and a high-fidelity "developer" aesthetic.
 
-1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Run the following SQL in the Supabase SQL Editor to create the tables:
+---
+
+## ✨ Features
+
+- **⚡ High-Fidelity Design**: Strict purple-and-black premium aesthetic with glassmorphism, dot-grid backgrounds, and micro-animations.
+- **📈 Project Budget Engine**: Interactive 4-step project creation flow with dynamic scope and budget calculation (₹200–₹5,000).
+- **🛡️ Admin Control Center**: Unified Kanban-style board for managing project requests, viewing live platform stats, and issuing system-wide broadcasts.
+- **🔔 Live Notifications**: Real-time status updates and admin broadcasts delivered via a persistent sidebar notification system.
+- **📂 Floating Terminal Snippets**: Interactive landing page featuring drifting code snippet cards powered by Framer Motion.
+- **🧠 Domain Coverage**: Ready-to-ship projects in AI/ML, Python, Web Dev, Java, Android, and more.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React 18, Vite, TypeScript |
+| **Styling** | Tailwind CSS (Core), Framer Motion (Animations) |
+| **Database/Auth** | Supabase (PostgreSQL) |
+| **Icons** | Lucide React |
+| **State Management** | Zustand |
+| **Deployment** | Vercel |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+- Node.js (v18+)
+- NPM or PNPM
+- A Supabase Project
+
+### 2. Setup Environment
+Create a `.env` file in the root directory and add:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 3. Database Schema
+Run the following SQL in your Supabase SQL Editor to initialize the required tables:
 
 ```sql
-create table profiles (
-  id uuid references auth.users primary key,
-  email text,
+-- Profiles table
+create table public.profiles (
+  id uuid references auth.users on delete cascade primary key,
+  email text unique,
   full_name text,
   college text,
   course text,
+  role text default 'CLIENT',
   created_at timestamptz default now()
 );
 
-create table projects (
+-- Projects table
+create table public.projects (
   id uuid primary key default gen_random_uuid(),
   student_id uuid references profiles(id),
   title text not null,
   domain text,
   description text,
-  budget numeric not null,
+  budget numeric,
   tier text,
   scope jsonb,
-  tech_stack text[],
   status text default 'pending',
-  deadline date,
   payment_status text default 'unpaid',
-  deliverable_url text,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
-create table payments (
-  id uuid primary key default gen_random_uuid(),
-  project_id uuid references projects(id),
-  amount numeric,
-  milestone text,
-  razorpay_order_id text,
-  razorpay_payment_id text,
-  status text default 'pending',
-  paid_at timestamptz
-);
-
-create table tickets (
-  id uuid primary key default gen_random_uuid(),
-  project_id uuid references projects(id),
-  student_id uuid references profiles(id),
-  message text,
-  reply text,
-  status text default 'open',
   created_at timestamptz default now()
 );
 
-create table components (
+-- Notifications table
+create table public.notifications (
   id uuid primary key default gen_random_uuid(),
-  name text,
-  category text,
-  description text,
-  tech_stack text[],
-  reuse_cost numeric,
-  code_snippet text
+  user_id uuid references profiles(id),
+  title text,
+  message text,
+  type text default 'info',
+  is_read boolean default false,
+  created_at timestamptz default now()
 );
-
--- Enable RLS
-alter table profiles enable row level security;
-alter table projects enable row level security;
-alter table payments enable row level security;
-alter table tickets enable row level security;
-alter table components enable row level security;
-
--- Basic RLS Policies (For MVP, adjust as needed)
-create policy "Users can view own profile" on profiles for select using (auth.uid() = id);
-create policy "Users can insert own profile" on profiles for insert with check (auth.uid() = id);
-create policy "Users can update own profile" on profiles for update using (auth.uid() = id);
-
-create policy "Users can view own projects" on projects for select using (auth.uid() = student_id);
-create policy "Users can insert own projects" on projects for insert with check (auth.uid() = student_id);
-create policy "Users can update own projects" on projects for update using (auth.uid() = student_id);
-
-create policy "Users can view own tickets" on tickets for select using (auth.uid() = student_id);
-create policy "Users can insert own tickets" on tickets for insert with check (auth.uid() = student_id);
-
--- Note: In a real app, add admin policies using custom claims or an admin table.
 ```
 
-3. Add your Supabase URL and Anon Key to `.env.local`:
-```
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+### 4. Installation
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
 ```
 
-4. Run the app: `npm run dev`
+---
+
+## 🔑 Permissions & Access
+
+- **Admin Access**: User permissions are hardcoded to grant Admin status to `ps4689203@gmail.com`. Admins have access to the `/admin/requests` analytics and broadcast features.
+- **Security**: The platform uses Supabase Row Level Security (RLS) to ensure project privacy and secure data fetching.
+
+---
+
+## 📦 Project Structure
+
+```text
+/src
+  /components
+    /layout     - Sidebar, Header, Ticker
+    /ui         - Reusable design system components
+  /lib          - Supabase client & utilities
+  /pages        - Feature-specific views (Landing, Admin, Dashboard)
+  /store        - Zustand state management
+  /App.tsx      - Route definitions
+  /index.css    - Global theme design tokens
+```
+
+---
+
+## 📄 License
+© 2024 Syntax.market. Built with ❤️ for the student community.
