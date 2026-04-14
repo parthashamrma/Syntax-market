@@ -104,6 +104,16 @@ npm run dev
 
 ---
 
+## 🚀 Deployment (Vercel)
+
+1. **Connect GitHub**: Import your repository into Vercel.
+2. **Framework**: Select **Vite** as the framework preset.
+3. **Env Vars**: Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the Vercel project settings.
+4. **Build**: Build command `npm run build`, output directory `dist`.
+5. **Auto-Deploy**: Every push to the `main` branch will automatically trigger a production build.
+
+---
+
 ## 📦 Project Structure
 
 ```text
