@@ -2,8 +2,8 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/src/components/ui/Button';
 import { Card, CardContent } from '@/src/components/ui/Card';
-import { 
-  Code2, Database, Layout as LayoutIcon, Smartphone, 
+import {
+  Code2, Database, Layout as LayoutIcon, Smartphone,
   Cpu, Server, Shield, Zap, ChevronDown
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -58,10 +58,10 @@ export function Landing() {
   return (
     <div className="relative bg-background text-text-primary">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4">
+      <section className="relative min-h-[calc(100vh-98px)] flex flex-col items-center justify-center px-4">
         {/* Technical Dot-grid Background */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div 
+          <div
             className="absolute inset-0 opacity-[0.03]"
             style={{
               backgroundImage: `radial-gradient(var(--color-primary) 1px, transparent 1px)`,
@@ -73,22 +73,22 @@ export function Landing() {
 
         {/* Floating Terminal Cards */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <FloatingCard 
+          <FloatingCard
             snippet='{ "status": "delivered", "id": "101" }'
             className="top-[15%] left-[8%] rotate-[-3deg]"
             delay={0}
           />
-          <FloatingCard 
+          <FloatingCard
             snippet="SELECT * FROM projects WHERE status = 'live'"
             className="top-[25%] right-[10%] rotate-[3deg]"
             delay={1}
           />
-          <FloatingCard 
+          <FloatingCard
             snippet="git push origin production"
             className="bottom-[35%] left-[12%] rotate-[-1deg]"
             delay={2}
           />
-          <FloatingCard 
+          <FloatingCard
             snippet="Build successful in 42s"
             className="bottom-[25%] right-[12%] rotate-[2deg]"
             delay={1.5}
@@ -126,7 +126,7 @@ export function Landing() {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -150,14 +150,14 @@ export function Landing() {
             className="mt-16 flex items-center justify-center gap-3"
           >
             <div className="relative flex h-2.5 w-2.5">
-              <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-40" />
-              <div className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
+              <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-40" />
+              <div className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
             </div>
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-text-muted">8 Deployment pods active</span>
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-white">8 Deployment pods active</span>
           </motion.div>
         </div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 1 }}
@@ -177,7 +177,7 @@ export function Landing() {
               { label: 'Uptime', value: '99.9%' },
               { label: 'Latency', value: '24ms' },
             ].map((stat, i) => (
-              <motion.div 
+              <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -199,7 +199,7 @@ export function Landing() {
           <h2 className="text-3xl sm:text-4xl font-heading font-black mb-4">Engineering Capabilities</h2>
           <p className="text-text-muted max-w-xl mx-auto text-sm sm:text-base">From cloud-native applications to low-level systems and machine learning pipelines.</p>
         </div>
-        
+
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {domains.map((domain, i) => (
             <motion.div
@@ -229,29 +229,29 @@ export function Landing() {
             <h2 className="text-3xl sm:text-4xl font-heading font-black mb-4 italic">Execution Pipeline</h2>
             <p className="text-text-muted uppercase text-[10px] sm:text-xs font-mono tracking-widest">Optimized for speed and technical excellence.</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
             {[
-              { 
-                step: '01', 
-                title: 'Spec Review', 
+              {
+                step: '01',
+                title: 'Spec Review',
                 desc: 'Define technical requirements and project scope with precision.',
                 icon: <Code2 className="w-10 h-10 text-primary" />
               },
-              { 
-                step: '02', 
-                title: 'Auth Check', 
+              {
+                step: '02',
+                title: 'Auth Check',
                 desc: 'Instant verification by our senior engineering leads.',
                 icon: <Shield className="w-10 h-10 text-primary" />
               },
-              { 
-                step: '03', 
-                title: 'Final Commit', 
+              {
+                step: '03',
+                title: 'Final Commit',
                 desc: 'Automated delivery pipelines ensure zero-downtime shipping.',
                 icon: <Zap className="w-10 h-10 text-primary" />
               },
             ].map((item, i) => (
-              <motion.div 
+              <motion.div
                 key={item.step}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
