@@ -103,7 +103,7 @@ export function Dashboard() {
               </div>
             ) : projects.length > 0 ? (
               projects.map((project) => (
-                <Link key={project.id} to={`/project/${project.id}`}>
+                <Link key={project.id} to={`/projects/${project.id}`}>
                   <Card className="bg-surface border-border hover:border-primary/30 transition-all p-5">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-4 min-w-0">

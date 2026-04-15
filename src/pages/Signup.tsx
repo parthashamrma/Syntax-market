@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/src/lib/supabase';
 import { Button } from '@/src/components/ui/Button';
 import { Input } from '@/src/components/ui/Input';
 import { Label } from '@/src/components/ui/Label';
-import { Terminal, Eye, EyeOff, Mail, Lock, User, ArrowLeft, Github, Check, Activity, Shield } from 'lucide-react';
-import { cn } from '@/src/lib/utils';
+import { Terminal, Eye, EyeOff, Mail, Lock, User, ArrowLeft, Github, Activity, Shield } from 'lucide-react';
 import { Card } from '@/src/components/ui/Card';
 
 export function Signup() {
@@ -38,7 +37,7 @@ export function Signup() {
 
   const passwordStrength = getPasswordStrength();
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignup = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -88,10 +87,36 @@ export function Signup() {
         id: userId,
         email,
         full_name: firstName,
+        first_project_used: false,
         created_at: new Date().toISOString(),
       });
     } catch (err) {
       console.error('Error creating profile:', err);
+    }
+  };
+
+  const handleVerifyOtp = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'signup',
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        await createProfile(data.user.id);
+        navigate('/dashboard');
+      }
+    } catch (err: any) {
+      setError(err.message || 'VERIFICATION_FAILURE: Invalid code or token expired.');
+    } finally {
+      setLoading(false);
     }
   };
 

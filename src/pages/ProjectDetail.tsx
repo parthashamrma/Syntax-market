@@ -1,12 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/src/lib/supabase';
+import { formatCurrency, getDeliveryOptionMeta, hasFirstProjectDiscount } from '@/src/lib/projectUtils';
 import { useAuthStore } from '@/src/store/authStore';
 import { Card } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
 import { 
-  CheckCircle, Clock, Activity, MessageSquare, 
-  IndianRupee, Download, ChevronLeft, Terminal
+  Activity,
+  CheckCircle,
+  ChevronLeft,
+  Clock,
+  Download,
+  ExternalLink,
+  Github,
+  IndianRupee,
+  Link2,
+  MessageSquare,
+  PackageCheck,
+  Terminal,
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
@@ -59,6 +70,55 @@ export function ProjectDetail() {
       NODE_NOT_FOUND // 404
     </div>
   );
+
+  const deliveryMeta = getDeliveryOptionMeta(project.delivery_preference);
+  const discounted = hasFirstProjectDiscount(project);
+  const originalBudget = Number(project.original_budget ?? project.budget ?? 0);
+  const finalBudget = Number(project.budget ?? 0);
+  const githubUsername = project.github_username ? `@${String(project.github_username).replace(/^@/, '')}` : null;
+
+  const renderDeliveryResult = () => {
+    if (project.delivery_preference === 'zip_file' && project.delivery_zip_url) {
+      return (
+        <a href={project.delivery_zip_url} target="_blank" rel="noreferrer" className="w-full">
+          <Button className="w-full gap-2 text-[10px] font-mono tracking-widest font-bold">
+            <Download className="w-4 h-4" /> DOWNLOAD_ZIP
+          </Button>
+        </a>
+      );
+    }
+
+    if (project.delivery_preference === 'repo_link' && project.delivery_repo_url) {
+      return (
+        <a href={project.delivery_repo_url} target="_blank" rel="noreferrer" className="w-full">
+          <Button className="w-full gap-2 text-[10px] font-mono tracking-widest font-bold">
+            <ExternalLink className="w-4 h-4" /> OPEN_REPO
+          </Button>
+        </a>
+      );
+    }
+
+    if (project.delivery_preference === 'github_collaboration') {
+      return (
+        <div className="rounded-lg border border-border bg-background p-4 text-left">
+          <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary">Collaboration Status</p>
+          <p className="mt-2 text-sm text-text-primary">
+            {project.collaboration_invite_sent
+              ? `GitHub invite sent to ${githubUsername ?? 'the provided username'}.`
+              : 'Waiting for admin to send the GitHub collaboration invite.'}
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="p-4 rounded-lg bg-background border border-border border-dashed flex flex-col items-center justify-center text-center">
+        <Download className="w-8 h-8 text-border mb-2" />
+        <p className="text-[9px] font-mono text-text-muted uppercase tracking-widest">Repository Locked</p>
+        <p className="text-[8px] text-text-muted mt-1 uppercase">Awaiting final state delivery</p>
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
@@ -113,6 +173,40 @@ export function ProjectDetail() {
                   <span className={cn("text-xs font-black tracking-tight uppercase", item.color)}>{item.value}</span>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div className="rounded-xl border border-border bg-background p-5">
+                <p className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-text-muted">Pricing</p>
+                {discounted ? (
+                  <div className="mt-3 flex items-center gap-3">
+                    <span className="text-sm font-mono text-emerald-100/60 line-through">{formatCurrency(originalBudget)}</span>
+                    <span className="text-2xl font-black text-emerald-200">{formatCurrency(finalBudget)}</span>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-2xl font-black text-text-primary">{formatCurrency(finalBudget)}</p>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-border bg-background p-5">
+                <p className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-text-muted">Delivery Method</p>
+                <div className="mt-3 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+                    {project.delivery_preference === 'github_collaboration' ? (
+                      <Github className="w-4 h-4" />
+                    ) : project.delivery_preference === 'repo_link' ? (
+                      <Link2 className="w-4 h-4" />
+                    ) : (
+                      <PackageCheck className="w-4 h-4" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-text-primary">{deliveryMeta.title}</p>
+                    <p className="text-[11px] text-text-muted">{deliveryMeta.description}</p>
+                    {githubUsername && <p className="mt-1 text-[11px] font-mono text-primary">{githubUsername}</p>}
+                  </div>
+                </div>
+              </div>
             </div>
           </Card>
 
@@ -179,11 +273,27 @@ export function ProjectDetail() {
           <Card className="p-6 bg-surface border-border">
             <h3 className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-4">Assets_Repository</h3>
             <div className="flex flex-col gap-3">
-              <div className="p-4 rounded-lg bg-background border border-border border-dashed flex flex-col items-center justify-center text-center">
-                <Download className="w-8 h-8 text-border mb-2" />
-                <p className="text-[9px] font-mono text-text-muted uppercase tracking-widest">Repository Locked</p>
-                <p className="text-[8px] text-text-muted mt-1 uppercase">Awaiting final state delivery</p>
+              <div className="rounded-lg border border-border bg-background p-4">
+                <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted">Selected Delivery</p>
+                <p className="mt-2 text-sm font-black text-text-primary">{deliveryMeta.title}</p>
+                <p className="mt-1 text-[11px] text-text-muted leading-relaxed">{deliveryMeta.description}</p>
+                {githubUsername && (
+                  <p className="mt-2 text-[10px] font-mono uppercase tracking-wide text-primary">
+                    GitHub Username: {githubUsername}
+                  </p>
+                )}
               </div>
+              {renderDeliveryResult()}
+              {project.delivery_preference === 'repo_link' && project.delivery_repo_url && (
+                <a
+                  href={project.delivery_repo_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[10px] font-mono uppercase tracking-widest text-primary hover:text-primary-hover"
+                >
+                  {project.delivery_repo_url}
+                </a>
+              )}
             </div>
           </Card>
 

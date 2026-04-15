@@ -1,13 +1,32 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, type DragEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/src/lib/supabase';
+import {
+  formatCurrency,
+  getDeliveryOptionMeta,
+  hasFirstProjectDiscount,
+  PROJECT_DELIVERY_BUCKET,
+} from '@/src/lib/projectUtils';
 import { useAuthStore } from '@/src/store/authStore';
 import { Card } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
 import { 
-  FileText, CheckCircle, Activity, Users, Radio, X, Send, 
-  Package, DollarSign, Tag, ArrowRight, Inbox
+  ArrowRight,
+  Activity,
+  CheckCircle,
+  DollarSign,
+  FileText,
+  Github,
+  Inbox,
+  Link2,
+  Package,
+  Radio,
+  Send,
+  Tag,
+  Upload,
+  Users,
+  X,
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
@@ -126,7 +145,7 @@ function ProjectDetailModal({
 }: { 
   project: any; 
   onClose: () => void; 
-  onUpdateStatus: (id: string, updates: any) => void;
+  onUpdateStatus: (id: string, updates: any) => Promise<boolean>;
   validTransitions: Record<string, string[]>;
 }) {
   if (!project) return null;
@@ -152,6 +171,89 @@ function ProjectDetailModal({
   };
 
   const allowed = validTransitions[project.status] || [];
+  const deliveryMeta = getDeliveryOptionMeta(project.delivery_preference);
+  const discounted = hasFirstProjectDiscount(project);
+  const originalBudget = Number(project.original_budget ?? project.budget ?? 0);
+  const finalBudget = Number(project.budget ?? 0);
+  const githubUsername = project.github_username ? `@${String(project.github_username).replace(/^@/, '')}` : null;
+  const [repoUrl, setRepoUrl] = useState(project.delivery_repo_url ?? '');
+  const [deliveryFile, setDeliveryFile] = useState<File | null>(null);
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
+  const [deliveryBusy, setDeliveryBusy] = useState(false);
+
+  useEffect(() => {
+    setRepoUrl(project.delivery_repo_url ?? '');
+    setDeliveryFile(null);
+    setDeliveryError(null);
+    setDeliveryBusy(false);
+  }, [project]);
+
+  const handleTransition = async (updates: any) => {
+    const success = await onUpdateStatus(project.id, updates);
+    if (success) onClose();
+  };
+
+  const handleCompleteDelivery = async () => {
+    setDeliveryError(null);
+    setDeliveryBusy(true);
+
+    try {
+      if (project.delivery_preference === 'zip_file') {
+        if (!deliveryFile) {
+          setDeliveryError('ZIP file is required before marking this project complete.');
+          return;
+        }
+
+        const filePath = `${project.student_id}/${project.id}/${Date.now()}-${deliveryFile.name.replace(/\s+/g, '-')}`;
+        const { error: uploadError } = await supabase.storage
+          .from(PROJECT_DELIVERY_BUCKET)
+          .upload(filePath, deliveryFile, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage.from(PROJECT_DELIVERY_BUCKET).getPublicUrl(filePath);
+        await handleTransition({
+          status: 'delivered',
+          delivery_zip_url: data.publicUrl,
+          delivery_zip_name: deliveryFile.name,
+          delivery_repo_url: null,
+          collaboration_invite_sent: false,
+        });
+        return;
+      }
+
+      if (project.delivery_preference === 'repo_link') {
+        if (!repoUrl.trim()) {
+          setDeliveryError('GitHub repository link is required before completion.');
+          return;
+        }
+
+        await handleTransition({
+          status: 'delivered',
+          delivery_repo_url: repoUrl.trim(),
+          delivery_zip_url: null,
+          collaboration_invite_sent: false,
+        });
+        return;
+      }
+
+      if (!project.github_username) {
+        setDeliveryError('Client GitHub username is missing for collaboration delivery.');
+        return;
+      }
+
+      await handleTransition({
+        status: 'delivered',
+        collaboration_invite_sent: true,
+        collaboration_invite_sent_at: new Date().toISOString(),
+      });
+    } catch (error: any) {
+      console.error('Delivery completion error:', error);
+      setDeliveryError(error?.message || 'Failed to complete delivery.');
+    } finally {
+      setDeliveryBusy(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center">
@@ -237,6 +339,31 @@ function ProjectDetailModal({
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 rounded-lg bg-background border border-border space-y-2">
+              <label className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted flex items-center gap-2">
+                <Package className="w-3.5 h-3.5" /> Delivery Method
+              </label>
+              <p className="text-sm font-bold text-text-primary">{deliveryMeta.title}</p>
+              <p className="text-[11px] text-text-muted leading-relaxed">{deliveryMeta.description}</p>
+              {githubUsername && <p className="text-[10px] font-mono uppercase tracking-widest text-primary">{githubUsername}</p>}
+            </div>
+
+            <div className="p-4 rounded-lg bg-background border border-border space-y-2">
+              <label className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted flex items-center gap-2">
+                <DollarSign className="w-3.5 h-3.5" /> Pricing Snapshot
+              </label>
+              {discounted ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-mono text-text-muted line-through">{formatCurrency(originalBudget)}</span>
+                  <span className="text-lg font-black text-primary">{formatCurrency(finalBudget)}</span>
+                </div>
+              ) : (
+                <p className="text-lg font-black text-primary">{formatCurrency(finalBudget)}</p>
+              )}
+            </div>
+          </div>
+
           {/* Admin Notes */}
           {project.admin_notes && (
             <div className="space-y-2">
@@ -246,21 +373,81 @@ function ProjectDetailModal({
               </div>
             </div>
           )}
+
+          {allowed.includes('delivered') && (
+            <div className="space-y-3 rounded-xl border border-primary/15 bg-primary/5 p-5">
+              <div>
+                <p className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-primary">Delivery Fulfillment</p>
+                <p className="mt-2 text-sm text-text-muted">Complete the project using the client’s selected delivery method.</p>
+              </div>
+
+              {project.delivery_preference === 'zip_file' && (
+                <div className="space-y-3">
+                  <label className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted">Upload ZIP File</label>
+                  <input
+                    type="file"
+                    accept=".zip"
+                    onChange={(e) => setDeliveryFile(e.target.files?.[0] ?? null)}
+                    className="block w-full rounded-lg border border-border bg-background px-4 py-3 text-xs text-text-muted file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-[10px] file:font-bold file:text-[#0B0F14]"
+                  />
+                </div>
+              )}
+
+              {project.delivery_preference === 'repo_link' && (
+                <div className="space-y-3">
+                  <label className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted">GitHub Repo URL</label>
+                  <input
+                    type="url"
+                    value={repoUrl}
+                    onChange={(e) => setRepoUrl(e.target.value)}
+                    placeholder="https://github.com/org/private-repo"
+                    className="w-full h-11 px-4 rounded-lg bg-background border border-border text-text-primary text-xs font-mono focus:border-primary/50 focus:outline-none transition-colors"
+                  />
+                </div>
+              )}
+
+              {project.delivery_preference === 'github_collaboration' && (
+                <div className="rounded-lg border border-border bg-background p-4 space-y-2">
+                  <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted">GitHub Collaboration Invite</p>
+                  <p className="text-sm text-text-primary">Send a private repo invite to {githubUsername ?? 'the provided username'}.</p>
+                  <p className="text-[11px] text-text-muted">Use the button below after you have manually sent the collaborator invite.</p>
+                </div>
+              )}
+
+              {deliveryError && (
+                <p className="text-[11px] text-danger font-mono">{deliveryError}</p>
+              )}
+
+              <Button
+                onClick={() => { void handleCompleteDelivery(); }}
+                disabled={deliveryBusy}
+                className="gap-2 text-[10px] font-mono tracking-widest font-bold"
+              >
+                {deliveryBusy ? (
+                  <><Activity className="w-4 h-4 animate-spin" /> COMPLETING...</>
+                ) : project.delivery_preference === 'github_collaboration' ? (
+                  <><Github className="w-4 h-4" /> MARK_INVITE_SENT</>
+                ) : project.delivery_preference === 'repo_link' ? (
+                  <><Link2 className="w-4 h-4" /> COMPLETE_WITH_REPO</>
+                ) : (
+                  <><Upload className="w-4 h-4" /> COMPLETE_WITH_ZIP</>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Actions */}
         <div className="p-6 border-t border-border flex flex-wrap items-center gap-3">
           {allowed.map((nextStatus) => {
+            if (nextStatus === 'delivered') return null;
             const label = statusLabels[nextStatus] || nextStatus;
             const isReject = nextStatus === 'rejected';
             return (
               <Button
                 key={nextStatus}
                 variant={isReject ? 'outline' : undefined}
-                onClick={() => {
-                  onUpdateStatus(project.id, { status: nextStatus });
-                  onClose();
-                }}
+                onClick={() => { void handleTransition({ status: nextStatus }); }}
                 className={cn(
                   "gap-2 text-[10px] font-mono tracking-widest font-bold",
                   isReject && "border-danger/40 text-danger hover:bg-danger/10"
@@ -271,7 +458,7 @@ function ProjectDetailModal({
               </Button>
             );
           })}
-          {allowed.length === 0 && (
+          {allowed.filter((status) => status !== 'delivered').length === 0 && !allowed.includes('delivered') && (
             <span className="text-[10px] font-mono text-text-muted uppercase tracking-widest">NO_TRANSITIONS_AVAILABLE</span>
           )}
         </div>
@@ -343,13 +530,13 @@ export function Requests() {
 
   const updateProject = async (projectId: string, updates: any) => {
     const project = projects.find(p => p.id === projectId);
-    if (!project) return;
+    if (!project) return false;
 
     if (updates.status && updates.status !== project.status) {
       const allowed = VALID_TRANSITIONS[project.status as keyof typeof VALID_TRANSITIONS] || [];
       if (!allowed.includes(updates.status)) {
         alert(`Invalid transition: Cannot move from ${project.status} to ${updates.status}`);
-        return;
+        return false;
       }
     }
 
@@ -378,21 +565,30 @@ export function Requests() {
         });
       }
       
-      setProjects(projects.map(p => p.id === projectId ? { ...p, ...updates } : p));
+      setProjects((currentProjects) =>
+        currentProjects.map((currentProject) =>
+          currentProject.id === projectId ? { ...currentProject, ...updates } : currentProject
+        )
+      );
+      setSelectedProject((currentProject: any) =>
+        currentProject?.id === projectId ? { ...currentProject, ...updates } : currentProject
+      );
+      return true;
     } catch (error) {
       console.error('Error updating project:', error);
       alert('Failed to update project status');
+      return false;
     }
   };
 
   // -- Drag and Drop Handlers --
-  const handleDragStart = (e: React.DragEvent, project: any) => {
+  const handleDragStart = (e: DragEvent, project: any) => {
     setDraggedProject(project);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', project.id);
   };
 
-  const handleDragOver = (e: React.DragEvent, status: string) => {
+  const handleDragOver = (e: DragEvent, status: string) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     setDragOverColumn(status);
@@ -402,7 +598,7 @@ export function Requests() {
     setDragOverColumn(null);
   };
 
-  const handleDrop = (e: React.DragEvent, targetStatus: string) => {
+  const handleDrop = (e: DragEvent, targetStatus: string) => {
     e.preventDefault();
     setDragOverColumn(null);
 

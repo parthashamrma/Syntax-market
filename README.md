@@ -86,6 +86,28 @@ create table public.notifications (
 );
 ```
 
+### Migration for First-Project Discount + Delivery Preferences
+If your tables already exist, run this migration before using the new request flow:
+
+```sql
+alter table public.profiles
+  add column if not exists first_project_used boolean not null default false;
+
+alter table public.projects
+  add column if not exists original_budget numeric,
+  add column if not exists discount_amount numeric default 0,
+  add column if not exists discount_type text,
+  add column if not exists delivery_preference text default 'zip_file',
+  add column if not exists github_username text,
+  add column if not exists delivery_zip_url text,
+  add column if not exists delivery_zip_name text,
+  add column if not exists delivery_repo_url text,
+  add column if not exists collaboration_invite_sent boolean default false,
+  add column if not exists collaboration_invite_sent_at timestamptz;
+
+create storage bucket if not exists "project-deliveries" with (public = true);
+```
+
 ### 4. Installation
 ```bash
 # Install dependencies

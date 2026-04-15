@@ -1,16 +1,43 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/src/lib/supabase';
 import { useAuthStore } from '@/src/store/authStore';
-import { calculateScope, getTierFromBudget, TIERS, ScopeResult } from '@/src/lib/scopeEngine';
+import { calculateScope, getTierFromBudget } from '@/src/lib/scopeEngine';
+import {
+  calculateFirstProjectDiscount,
+  DELIVERY_OPTIONS,
+  type DeliveryOptionId,
+  formatCurrency,
+  getDeliveryOptionMeta,
+  getFirstProjectUsed,
+} from '@/src/lib/projectUtils';
 import { Button } from '@/src/components/ui/Button';
 import { Input } from '@/src/components/ui/Input';
 import { Label } from '@/src/components/ui/Label';
 import {
-  Code2, Database, Layout as LayoutIcon, Smartphone, Cpu, Server, Shield, Zap,
-  Check, X, IndianRupee, Clock, Package, FileText, Sparkles, ChevronRight, AlertCircle,
-  Terminal, Activity, Send
+  Activity,
+  AlertCircle,
+  Archive,
+  Check,
+  ChevronRight,
+  Clock,
+  Code2,
+  Cpu,
+  Database,
+  FileText,
+  Github,
+  IndianRupee,
+  Layout as LayoutIcon,
+  Link2,
+  Package,
+  Send,
+  Server,
+  Shield,
+  Smartphone,
+  Tag,
+  Terminal,
+  Zap,
 } from 'lucide-react';
 import { Card } from '@/src/components/ui/Card';
 
@@ -26,10 +53,16 @@ const domains = [
   { id: 'Spring Boot', name: 'Spring Boot', icon: Shield },
 ];
 
+const deliveryIcons: Record<DeliveryOptionId, typeof Archive> = {
+  zip_file: Archive,
+  repo_link: Link2,
+  github_collaboration: Github,
+};
+
 const STEPS = ['Node_Domain', 'Spec_Details', 'Resource_Allocation', 'Final_Verification'];
 
 export function NewProject() {
-  const { user } = useAuthStore();
+  const { user, profile, setProfile } = useAuthStore();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1);
@@ -37,6 +70,8 @@ export function NewProject() {
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
   const [budget, setBudget] = useState(500);
+  const [deliveryPreference, setDeliveryPreference] = useState<DeliveryOptionId>('zip_file');
+  const [githubUsername, setGithubUsername] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -49,31 +84,85 @@ export function NewProject() {
   }, [budget, domain, description]);
 
   const currentTier = getTierFromBudget(budget);
+  const firstProjectUsed = getFirstProjectUsed(profile);
+  const promoPricing = calculateFirstProjectDiscount(budget);
+  const previewPrice = firstProjectUsed ? budget : promoPricing.discountedAmount;
+  const selectedDeliveryMeta = getDeliveryOptionMeta(deliveryPreference);
+  const sanitizedGithubUsername = githubUsername.trim().replace(/^@/, '');
+  const canMoveToResourceAllocation =
+    Boolean(description.trim()) &&
+    Boolean(title.trim()) &&
+    (deliveryPreference !== 'github_collaboration' || Boolean(sanitizedGithubUsername));
 
   const handleSubmit = async () => {
     if (!user || !scope) return;
+
+    if (deliveryPreference === 'github_collaboration' && !sanitizedGithubUsername) {
+      setSubmitError('DELIVERY_PREF_ERROR: GitHub username required for collaboration invite delivery.');
+      return;
+    }
+
     setLoading(true);
     setSubmitError(null);
 
     try {
-      const { data, error } = await supabase
+      const [{ data: latestProfile, error: profileError }, { count, error: countError }] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('id, first_project_used')
+          .eq('id', user.id)
+          .single(),
+        supabase
+          .from('projects')
+          .select('id', { count: 'exact', head: true })
+          .eq('student_id', user.id),
+      ]);
+
+      if (profileError) throw profileError;
+      if (countError) throw countError;
+
+      const isEligibleForDiscount = !getFirstProjectUsed(latestProfile ?? profile) && (count ?? 0) === 0;
+      const pricing = isEligibleForDiscount
+        ? calculateFirstProjectDiscount(budget)
+        : { originalAmount: budget, discountedAmount: budget, savedAmount: 0 };
+
+      const { error } = await supabase
         .from('projects')
         .insert({
           student_id: user.id,
           title: title || `${domain} Project`,
           domain,
           description,
-          budget: budget,
+          budget: pricing.discountedAmount,
+          original_budget: pricing.originalAmount,
+          discount_amount: pricing.savedAmount,
+          discount_type: isEligibleForDiscount ? 'first_project_50' : null,
           tier: scope.tier,
           scope: scope,
           tech_stack: scope.techStack,
           status: 'pending',
-          payment_status: 'none'
-        })
-        .select()
-        .single();
+          payment_status: 'none',
+          delivery_preference: deliveryPreference,
+          github_username: deliveryPreference === 'github_collaboration' ? sanitizedGithubUsername : null,
+        });
 
       if (error) throw error;
+
+      if (isEligibleForDiscount) {
+        const { data: updatedProfile, error: updateProfileError } = await supabase
+          .from('profiles')
+          .update({ first_project_used: true })
+          .eq('id', user.id)
+          .select('*')
+          .single();
+
+        if (updateProfileError) {
+          console.error('Error updating first project flag:', updateProfileError);
+        } else {
+          setProfile(updatedProfile);
+        }
+      }
+
       navigate(`/dashboard`);
     } catch (error: any) {
       console.error('Error creating project:', error);
@@ -87,6 +176,27 @@ export function NewProject() {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-10">
+      {!firstProjectUsed && (
+        <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-6 py-5 shadow-[0_0_30px_rgba(16,185,129,0.12)]">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-300/30 bg-emerald-400/15 text-emerald-200">
+              <Tag className="w-5 h-5" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-[11px] font-mono font-bold uppercase tracking-[0.3em] text-emerald-200/80">
+                First_Project_Discount
+              </p>
+              <h2 className="text-xl font-black text-white">
+                First project? You get 50% off! Price drops from ₹499 → ₹249 automatically.
+              </h2>
+              <p className="text-sm text-emerald-100/80 font-mono">
+                The discount is checked on submission and locks after your first request is created.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Technical Stepper */}
       <div className="relative">
         <div className="flex items-center justify-between relative z-10">
@@ -188,9 +298,78 @@ export function NewProject() {
                 </p>
               </div>
 
+              <div className="space-y-5 rounded-2xl border border-border bg-background/60 p-6">
+                <div>
+                  <h3 className="text-lg font-black uppercase tracking-tight text-text-primary">Project Delivery Preference</h3>
+                  <p className="text-[11px] text-text-muted font-mono mt-2">
+                    Choose how you want the completed project delivered when the admin marks it done.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                  {DELIVERY_OPTIONS.map((option) => {
+                    const OptionIcon = deliveryIcons[option.id];
+                    const isActive = deliveryPreference === option.id;
+
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => setDeliveryPreference(option.id)}
+                        className={cn(
+                          "rounded-2xl border p-5 text-left transition-all",
+                          isActive
+                            ? 'border-primary bg-primary/8 shadow-[0_0_24px_rgba(94,230,255,0.12)]'
+                            : 'border-border bg-surface hover:border-primary/30'
+                        )}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-3">
+                            <div className={cn(
+                              "flex h-11 w-11 items-center justify-center rounded-xl border",
+                              isActive
+                                ? 'border-primary/30 bg-primary/10 text-primary'
+                                : 'border-border bg-background text-text-muted'
+                            )}>
+                              <OptionIcon className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-black text-text-primary uppercase tracking-tight">{option.title}</p>
+                              <p className="mt-2 text-[11px] text-text-muted leading-relaxed">{option.description}</p>
+                            </div>
+                          </div>
+                          <span className={cn(
+                            "mt-1 h-4 w-4 rounded-full border-2",
+                            isActive ? 'border-primary bg-primary' : 'border-border'
+                          )} />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {deliveryPreference === 'github_collaboration' && (
+                  <div className="space-y-3">
+                    <Label htmlFor="githubUsername" className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-text-muted">
+                      Github_Username
+                    </Label>
+                    <Input
+                      id="githubUsername"
+                      placeholder="@yourgithubhandle"
+                      value={githubUsername}
+                      onChange={(e) => setGithubUsername(e.target.value)}
+                      className="bg-background border-border focus:border-primary text-text-primary font-mono text-sm h-12"
+                    />
+                    <p className="text-[10px] font-mono text-text-muted uppercase tracking-wide">
+                      This username will be shown to admin for the private collaborator invite.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-between pt-6 border-t border-border">
                 <Button variant="outline" onClick={() => setStep(1)} className="font-mono font-bold uppercase tracking-widest">Ret_Prev</Button>
-                <Button size="lg" onClick={() => setStep(3)} disabled={!description || !title} className="font-mono font-bold uppercase tracking-widest px-10">
+                <Button size="lg" onClick={() => setStep(3)} disabled={!canMoveToResourceAllocation} className="font-mono font-bold uppercase tracking-widest px-10">
                   Next: Allocate_Resources <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
@@ -220,6 +399,20 @@ export function NewProject() {
                       {budget.toLocaleString('en-IN')}
                     </motion.span>
                   </div>
+                  {!firstProjectUsed && (
+                    <div className="mt-5 inline-flex flex-col items-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/8 px-6 py-4">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-[0.25em] text-emerald-200">
+                        First Project Pricing
+                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg font-mono text-emerald-100/60 line-through">{formatCurrency(budget)}</span>
+                        <span className="text-2xl font-black text-emerald-200">{formatCurrency(previewPrice)}</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-emerald-100/70 uppercase tracking-wide">
+                        Example starter drop: ₹499 → ₹249 automatically
+                      </span>
+                    </div>
+                  )}
                   <motion.div
                     key={currentTier.name}
                     initial={{ y: 5, opacity: 0 }}
@@ -346,8 +539,18 @@ export function NewProject() {
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="bg-background rounded-xl p-6 border border-border text-center group hover:border-primary/30 transition-all">
                     <IndianRupee className="w-6 h-6 text-primary mx-auto mb-2" />
+                    {!firstProjectUsed && (
+                      <div className="mb-2 space-y-1">
+                        <p className="text-sm font-mono text-text-muted line-through">{formatCurrency(budget)}</p>
+                        <p className="text-2xl font-black font-mono text-emerald-200">{formatCurrency(previewPrice)}</p>
+                      </div>
+                    )}
+                    {firstProjectUsed && (
                     <p className="text-2xl font-black font-mono text-text-primary">₹{budget.toLocaleString('en-IN')}</p>
-                    <p className="text-[8px] text-text-muted uppercase font-mono mt-1 tracking-widest">RES_ALLOC</p>
+                    )}
+                    <p className="text-[8px] text-text-muted uppercase font-mono mt-1 tracking-widest">
+                      {firstProjectUsed ? 'RES_ALLOC' : 'FIRST_PROJECT_PRICE'}
+                    </p>
                   </div>
                   <div className="bg-background rounded-xl p-6 border border-border text-center group hover:border-primary/30 transition-all">
                     <Package className="w-6 h-6 text-primary mx-auto mb-2" />
@@ -361,6 +564,29 @@ export function NewProject() {
                   </div>
                 </div>
 
+                <div className="rounded-2xl border border-border bg-background/50 p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+                      {(() => {
+                        const DeliveryIcon = deliveryIcons[deliveryPreference];
+                        return <DeliveryIcon className="w-5 h-5" />;
+                      })()}
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-text-muted">
+                        Project_Delivery_Preference
+                      </p>
+                      <p className="text-lg font-black text-text-primary">{selectedDeliveryMeta.title}</p>
+                      <p className="text-sm text-text-muted">{selectedDeliveryMeta.description}</p>
+                      {deliveryPreference === 'github_collaboration' && (
+                        <p className="text-[11px] font-mono uppercase tracking-wide text-primary">
+                          COLLAB_USERNAME: @{sanitizedGithubUsername}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 <div className="bg-background/50 rounded-xl border border-primary/10 p-6">
                   <label className="flex items-start gap-4 cursor-pointer">
                     <input
@@ -370,8 +596,17 @@ export function NewProject() {
                       onChange={(e) => setAgreed(e.target.checked)}
                     />
                     <span className="text-[11px] font-mono text-text-muted leading-relaxed uppercase tracking-wide">
+                      {firstProjectUsed ? (
+                        <>
                       I AUTHORIZE THE BROADCAST OF THIS DEPLOYMENT SPECIFICATION FOR <span className="text-primary font-black">₹{budget.toLocaleString('en-IN')}</span>.
-                      I ACKNOWLEDGE THAT FINAL CALIBRATION REFS WILL BE SYNCED BY ADMIN POST-BETA-REVIEW.
+                        </>
+                      ) : (
+                        <>
+                          I AUTHORIZE THE BROADCAST OF THIS DEPLOYMENT SPECIFICATION FOR <span className="text-primary font-black">{formatCurrency(previewPrice)}</span>.
+                          {' '}FIRST PROJECT DISCOUNT SAVES <span className="text-emerald-200 font-black">{formatCurrency(promoPricing.savedAmount)}</span>.
+                        </>
+                      )}
+                      {' '}I ACKNOWLEDGE THAT FINAL CALIBRATION REFS WILL BE SYNCED BY ADMIN POST-BETA-REVIEW.
                     </span>
                   </label>
                 </div>
