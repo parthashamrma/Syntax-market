@@ -54,21 +54,7 @@ export function Layout() {
 
               {/* LEFT: Hamburger + Logo */}
               <div className="flex items-center gap-3 flex-shrink-0">
-                {/* Hamburger — visible on mobile always; on desktop only for auth users */}
-                <button
-                  id="mobile-menu-toggle"
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className={`flex items-center justify-center w-10 h-10 rounded-lg bg-[#0B0F14] border border-primary/20 text-primary hover:bg-primary/10 active:scale-95 transition-all shrink-0 shadow-[0_0_10px_rgba(94,230,255,0.08)]
-                    ${user ? 'lg:hidden' : 'flex'}
-                  `}
-                  aria-label="Toggle Menu"
-                  aria-expanded={isMobileMenuOpen}
-                >
-                  {isMobileMenuOpen
-                    ? <X className="w-5 h-5" />
-                    : <Menu className="w-5 h-5" />
-                  }
-                </button>
+
 
                 {/* Logo / Status pill */}
                 {!user ? (
@@ -105,7 +91,7 @@ export function Layout() {
                 </div>
               )}
 
-              {/* RIGHT: Auth buttons (guest desktop) / Notification bell (auth) */}
+              {/* RIGHT: Auth buttons (guest desktop) / Notification bell (auth) / Hamburger (mobile) */}
               <nav className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                 {!user ? (
                   /* Guest: show login/join on desktop only — mobile uses hamburger */
@@ -134,6 +120,22 @@ export function Layout() {
                     <NotificationBell hideCounter={false} align="right" />
                   </div>
                 )}
+
+                {/* Hamburger — visible on mobile always; on desktop only for auth users */}
+                <button
+                  id="mobile-menu-toggle"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className={`flex items-center justify-center w-10 h-10 rounded-lg bg-[#0B0F14] border border-primary/20 text-primary hover:bg-primary/10 active:scale-95 transition-all shrink-0 shadow-[0_0_10px_rgba(94,230,255,0.08)]
+                    ${user ? 'lg:hidden' : 'flex'}
+                  `}
+                  aria-label="Toggle Menu"
+                  aria-expanded={isMobileMenuOpen}
+                >
+                  {isMobileMenuOpen
+                    ? <X className="w-5 h-5" />
+                    : <Menu className="w-5 h-5" />
+                  }
+                </button>
               </nav>
             </div>
           </div>
