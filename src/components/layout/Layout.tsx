@@ -69,9 +69,9 @@ export function Layout() {
               {/* Right: Auth Actions */}
               <nav className="flex items-center space-x-4">
                 {!user ? (
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-3">
                     <Link to="/login">
-                      <Button variant="ghost" className="h-9 px-4 text-xs font-semibold">Sign In</Button>
+                      <Button variant="outline" className="h-9 px-5 text-xs font-bold border-primary/40 text-primary hover:bg-primary/10 hover:border-primary/70 transition-all">Login</Button>
                     </Link>
                     <Link to="/signup">
                       <Button className="h-9 px-5 text-xs font-bold bg-primary text-[#0B0F14] hover:bg-primary-hover shadow-lg shadow-primary/10">Join Now</Button>

@@ -58,7 +58,7 @@ export function Landing() {
   return (
     <div className="relative bg-background text-text-primary">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden pt-20 px-4">
+      <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4">
         {/* Technical Dot-grid Background */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div 

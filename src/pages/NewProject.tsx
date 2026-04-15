@@ -10,8 +10,9 @@ import { Label } from '@/src/components/ui/Label';
 import {
   Code2, Database, Layout as LayoutIcon, Smartphone, Cpu, Server, Shield, Zap,
   Check, X, IndianRupee, Clock, Package, FileText, Sparkles, ChevronRight, AlertCircle,
-  Terminal, Activity
+  Terminal, Activity, Send
 } from 'lucide-react';
+import { Card } from '@/src/components/ui/Card';
 
 const domains = [
   { id: 'AI/ML', name: 'AI / ML', icon: Cpu },
