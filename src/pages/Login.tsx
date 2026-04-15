@@ -92,15 +92,15 @@ export function Login() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="w-full max-w-md relative z-10"
       >
-        <Card className="p-10 bg-surface border-border backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+        <Card className="p-6 sm:p-10 bg-surface border-border backdrop-blur-xl shadow-2xl relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
           
-          <div className="text-center mb-10">
-            <div className="inline-flex p-4 rounded-xl bg-background border border-border text-primary mb-6 shadow-inner group-hover:border-primary/20 transition-all">
-              <Terminal className="w-8 h-8" />
+          <div className="text-center mb-8 sm:mb-10">
+            <div className="inline-flex p-3 sm:p-4 rounded-xl bg-background border border-border text-primary mb-4 sm:mb-6 shadow-inner group-hover:border-primary/20 transition-all">
+              <Terminal className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
-            <h1 className="text-2xl font-heading font-black uppercase tracking-tight text-text-primary">Node Access</h1>
-            <p className="text-[10px] font-mono text-text-muted mt-2 uppercase tracking-[0.2em] font-bold">SYX_AUTH_SECURE_GATE // STANDBY</p>
+            <h1 className="text-xl sm:text-2xl font-heading font-black uppercase tracking-tight text-text-primary">Node Access</h1>
+            <p className="text-[8px] sm:text-[10px] font-mono text-text-muted mt-2 uppercase tracking-[0.2em] font-bold">SYX_AUTH_SECURE_GATE // STANDBY</p>
           </div>
 
           <AnimatePresence mode="wait">
@@ -132,7 +132,7 @@ export function Login() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted">Field_Keyphrase</Label>
+              <Label className="text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest text-text-muted">Field_Keyphrase</Label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                 <Input
@@ -141,7 +141,7 @@ export function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pl-12 h-14 bg-background border-border focus:border-primary text-text-primary font-mono text-xs uppercase tracking-widest"
+                  className="pl-12 h-12 sm:h-14 bg-background border-border focus:border-primary text-text-primary font-mono text-xs uppercase tracking-widest"
                 />
                 <button
                   type="button"
@@ -153,9 +153,9 @@ export function Login() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full h-14 text-[11px] font-mono font-bold uppercase tracking-[0.3em]" disabled={loading}>
+            <Button type="submit" className="w-full h-12 sm:h-14 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em]" disabled={loading}>
               {loading ? (
-                <span className="flex items-center gap-3">
+                <span className="flex items-center gap-2 sm:gap-3">
                   <Activity className="w-4 h-4 animate-spin" />
                   AUTH_IN_PROGRESS
                 </span>

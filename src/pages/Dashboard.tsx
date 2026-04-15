@@ -48,37 +48,37 @@ export function Dashboard() {
   return (
     <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-heading font-black flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-heading font-black flex items-center gap-3">
             Service Console
-            <span className="text-[10px] font-mono font-bold px-2 py-1 rounded bg-primary/10 text-primary uppercase tracking-[0.2em] border border-primary/20">Active</span>
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 py-1 rounded bg-primary/10 text-primary uppercase tracking-[0.2em] border border-primary/20">Active</span>
           </h1>
-          <p className="text-text-muted mt-1 font-mono text-xs uppercase tracking-widest">Node ID: SYN-USR-{user?.id.slice(0, 4)} // SECURE CONNECTED</p>
+          <p className="text-text-muted font-mono text-[10px] uppercase tracking-widest break-all">Node ID: SYN-USR-{user?.id.slice(0, 8)} // SECURE</p>
         </div>
-        <Link to="/new-project">
-          <Button size="lg" className="gap-2 font-bold px-8 shadow-lg shadow-primary/10">
+        <Link to="/new-project" className="w-full sm:w-auto">
+          <Button size="lg" className="w-full sm:w-auto gap-2 font-bold px-8 shadow-lg shadow-primary/10 h-12 sm:h-auto">
             <Plus className="w-4 h-4" /> New Deployment
           </Button>
         </Link>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           { label: 'ACTIVE NODES', value: stats.total, icon: FileText, color: 'text-primary' },
           { label: 'VERIFIED', value: stats.active, icon: CheckCircle, color: 'text-success' },
           { label: 'PENDING', value: stats.pending, icon: Clock, color: 'text-warning' },
           { label: 'COMPLETED', value: stats.delivered, icon: CheckCircle, color: 'text-primary' },
         ].map((stat, i) => (
-          <Card key={i} className="bg-surface border-border hover:border-primary/20 transition-all group p-6">
+          <Card key={i} className="bg-surface border-border hover:border-primary/20 transition-all group p-4 sm:p-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-[10px] font-mono font-bold text-text-muted uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-                <h3 className="text-3xl font-black font-mono">{stat.value}</h3>
+                <p className="text-[8px] sm:text-[10px] font-mono font-bold text-text-muted uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-1">{stat.label}</p>
+                <h3 className="text-xl sm:text-3xl font-black font-mono">{stat.value}</h3>
               </div>
-              <div className={`p-2 rounded-lg bg-background border border-border group-hover:border-primary/20 ${stat.color} transition-all`}>
-                <stat.icon className="w-5 h-5" />
+              <div className={`p-1.5 sm:p-2 rounded-lg bg-background border border-border group-hover:border-primary/20 ${stat.color} transition-all`}>
+                <stat.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
             </div>
           </Card>
@@ -104,32 +104,32 @@ export function Dashboard() {
             ) : projects.length > 0 ? (
               projects.map((project) => (
                 <Link key={project.id} to={`/projects/${project.id}`}>
-                  <Card className="bg-surface border-border hover:border-primary/30 transition-all p-5">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-10 h-10 rounded-lg bg-background border border-border flex items-center justify-center text-text-muted">
-                          <Terminal className="w-5 h-5 text-primary/60" />
+                  <Card className="bg-surface border-border hover:border-primary/30 transition-all p-4 sm:p-5">
+                    <div className="flex items-center justify-between gap-3 sm:gap-4">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-background border border-border flex items-center justify-center text-text-muted shrink-0">
+                          <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-primary/60" />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="font-bold text-sm truncate uppercase tracking-tight text-text-primary">{project.title}</h4>
-                          <p className="text-[10px] text-text-muted font-mono mt-0.5">{project.id.slice(0, 8)} // {new Date(project.created_at).toLocaleDateString()}</p>
+                          <h4 className="font-bold text-xs sm:text-sm truncate uppercase tracking-tight text-text-primary">{project.title}</h4>
+                          <p className="text-[8px] sm:text-[10px] text-text-muted font-mono mt-0.5 mt-0.5 truncate">{project.id.slice(0, 8)} // {new Date(project.created_at).toLocaleDateString()}</p>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-6 shrink-0">
-                        <div className="hidden md:block text-right">
+                      <div className="flex items-center gap-2 sm:gap-6 shrink-0">
+                        <div className="hidden sm:block text-right">
                           <p className="text-[10px] text-text-muted font-mono uppercase tracking-widest mb-0.5">Budget</p>
                           <p className="font-bold text-sm text-text-primary">₹{project.budget}</p>
                         </div>
                         <span className={cn(
-                          "px-3 py-1 rounded-full text-[9px] font-mono font-bold uppercase tracking-widest border",
+                          "px-2 sm:px-3 py-1 rounded-full text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest border shrink-0",
                           project.status === 'delivered' ? "bg-success/5 text-success border-success/20" :
                           project.status === 'pending' ? "bg-warning/5 text-warning border-warning/20" :
                           "bg-primary/5 text-primary border-primary/20"
                         )}>
                           {project.status.replace(/_/g, ' ')}
                         </span>
-                        <ChevronRight className="w-4 h-4 text-text-muted" />
+                        <ChevronRight className="w-4 h-4 text-text-muted hidden xs:block" />
                       </div>
                     </div>
                   </Card>

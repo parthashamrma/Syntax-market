@@ -102,7 +102,7 @@ export function Landing() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-6xl md:text-[80px] font-heading font-black tracking-tighter leading-[0.95] text-text-primary">
+            <h1 className="text-3xl sm:text-6xl md:text-[80px] font-heading font-black tracking-tighter leading-[1.1] md:leading-[0.95] text-text-primary px-2 sm:px-0">
               Build your vision. <br />
               <span className="text-primary">Ship with precision. ⚡</span>
             </h1>
@@ -114,11 +114,11 @@ export function Landing() {
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="mt-10 space-y-6"
           >
-            <p className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto leading-relaxed">
-              Premium academic engineering for modern developers. <br />
+            <p className="text-base sm:text-lg md:text-xl text-text-muted max-w-2xl mx-auto leading-relaxed px-4">
+              Premium academic engineering for modern developers. <br className="hidden sm:block" />
               Custom projects built to exact technical specifications.
             </p>
-            <div className="flex items-center justify-center space-x-8 text-[11px] font-bold text-text-muted/50 tracking-[0.4em] font-mono">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:space-x-8 text-[9px] sm:text-[11px] font-bold text-text-muted/50 tracking-[0.2em] sm:tracking-[0.4em] font-mono">
               <span className="hover:text-primary transition-colors cursor-default">BCA</span>
               <span className="hover:text-primary transition-colors cursor-default">MCA</span>
               <span className="hover:text-primary transition-colors cursor-default">B.TECH</span>
@@ -130,14 +130,14 @@ export function Landing() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6"
+            className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 px-4 sm:px-0 w-full sm:w-auto"
           >
-            <Link to="/new-project">
-              <Button size="lg" className="h-[64px] px-12 text-lg font-bold bg-primary text-[#0B0F14] rounded-xl shadow-[0_10px_40px_-10px_rgba(94,230,255,0.3)] transition-all hover:scale-105 hover:bg-primary-hover btn-shine">
+            <Link to="/new-project" className="w-full sm:w-auto">
+              <Button size="lg" className="h-[56px] sm:h-[64px] w-full px-8 sm:px-12 text-base sm:text-lg font-bold bg-primary text-[#0B0F14] rounded-xl shadow-[0_10px_40px_-10px_rgba(94,230,255,0.3)] transition-all hover:scale-105 hover:bg-primary-hover btn-shine">
                 Start My Project →
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="h-[64px] px-12 text-lg font-bold border-border text-text-primary hover:border-primary/50 hover:bg-primary/5 rounded-xl transition-all">
+            <Button variant="outline" size="lg" className="h-[56px] sm:h-[64px] w-full sm:w-auto px-8 sm:px-12 text-base sm:text-lg font-bold border-border text-text-primary hover:border-primary/50 hover:bg-primary/5 rounded-xl transition-all">
               View Showcase
             </Button>
           </motion.div>
@@ -168,9 +168,9 @@ export function Landing() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-24 border-y border-border bg-[#0D1117]">
+      <section className="py-16 sm:py-24 border-y border-border bg-[#0D1117]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
             {[
               { label: 'DELIVERED', value: '1,200+' },
               { label: 'STACKS', value: '45+' },
@@ -185,8 +185,8 @@ export function Landing() {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="group"
               >
-                <div className="text-4xl font-mono font-bold text-text-primary mb-2 group-hover:text-primary transition-colors">{stat.value}</div>
-                <div className="text-[10px] text-text-muted font-bold uppercase tracking-[0.3em] font-mono">{stat.label}</div>
+                <div className="text-2xl sm:text-4xl font-mono font-bold text-text-primary mb-1 sm:mb-2 group-hover:text-primary transition-colors">{stat.value}</div>
+                <div className="text-[8px] sm:text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] font-mono">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -194,13 +194,13 @@ export function Landing() {
       </section>
 
       {/* Domains Section */}
-      <section className="py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-24">
-          <h2 className="text-4xl font-heading font-black mb-4">Engineering Capabilities</h2>
-          <p className="text-text-muted max-w-xl mx-auto">From cloud-native applications to low-level systems and machine learning pipelines.</p>
+      <section className="py-20 sm:py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16 sm:mb-24">
+          <h2 className="text-3xl sm:text-4xl font-heading font-black mb-4">Engineering Capabilities</h2>
+          <p className="text-text-muted max-w-xl mx-auto text-sm sm:text-base">From cloud-native applications to low-level systems and machine learning pipelines.</p>
         </div>
         
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {domains.map((domain, i) => (
             <motion.div
               key={domain.name}
@@ -210,11 +210,11 @@ export function Landing() {
               transition={{ duration: 0.4, delay: i * 0.05 }}
             >
               <Card className="bg-surface border-border transition-all duration-300 hover:border-primary/30 hover:-translate-y-1 group">
-                <CardContent className="p-8 flex flex-col items-center justify-center text-center space-y-4">
-                  <div className="p-4 rounded-xl bg-background border border-border group-hover:border-primary/20 text-text-muted group-hover:text-primary transition-all duration-300">
-                    <domain.icon className="w-8 h-8" />
+                <CardContent className="p-6 sm:p-8 flex flex-col items-center justify-center text-center space-y-3 sm:space-y-4">
+                  <div className="p-3 sm:p-4 rounded-xl bg-background border border-border group-hover:border-primary/20 text-text-muted group-hover:text-primary transition-all duration-300">
+                    <domain.icon className="w-6 h-6 sm:w-8 sm:h-8" />
                   </div>
-                  <h3 className="font-mono font-bold text-sm tracking-tight">{domain.name}</h3>
+                  <h3 className="font-mono font-bold text-xs sm:text-sm tracking-tight">{domain.name}</h3>
                 </CardContent>
               </Card>
             </motion.div>
@@ -223,14 +223,14 @@ export function Landing() {
       </section>
 
       {/* How it Works */}
-      <section className="py-32 bg-[#0D1117] border-y border-border relative overflow-hidden">
+      <section className="py-20 sm:py-32 bg-[#0D1117] border-y border-border relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-28">
-            <h2 className="text-4xl font-heading font-black mb-4 italic">Execution Pipeline</h2>
-            <p className="text-text-muted uppercase text-xs font-mono tracking-widest">Optimized for speed and technical excellence.</p>
+          <div className="text-center mb-16 sm:mb-28">
+            <h2 className="text-3xl sm:text-4xl font-heading font-black mb-4 italic">Execution Pipeline</h2>
+            <p className="text-text-muted uppercase text-[10px] sm:text-xs font-mono tracking-widest">Optimized for speed and technical excellence.</p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
             {[
               { 
                 step: '01', 
@@ -259,11 +259,11 @@ export function Landing() {
                 transition={{ duration: 0.5, delay: i * 0.2 }}
                 className="flex flex-col items-center text-center group"
               >
-                <div className="mb-8 p-6 rounded-2xl bg-background border border-border text-primary font-mono font-bold text-4xl shadow-sm group-hover:shadow-[0_0_20px_rgba(94,230,255,0.1)] transition-all">
+                <div className="mb-6 sm:mb-8 p-5 sm:p-6 rounded-2xl bg-background border border-border text-primary font-mono font-bold text-3xl sm:text-4xl shadow-sm group-hover:shadow-[0_0_20px_rgba(94,230,255,0.1)] transition-all">
                   {item.step}
                 </div>
-                <h3 className="text-xl font-heading font-bold mb-4 tracking-tight uppercase">{item.title}</h3>
-                <p className="text-text-muted text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="text-lg sm:text-xl font-heading font-bold mb-3 sm:mb-4 tracking-tight uppercase">{item.title}</h3>
+                <p className="text-text-muted text-xs sm:text-sm leading-relaxed px-4 sm:px-0">{item.desc}</p>
               </motion.div>
             ))}
           </div>

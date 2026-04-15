@@ -124,25 +124,25 @@ export function ProjectDetail() {
     <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
       {/* Header with Back Link */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <Link to="/dashboard" className="flex items-center gap-2 text-[10px] font-mono font-bold text-text-muted hover:text-primary transition-colors uppercase tracking-widest">
             <ChevronLeft className="w-3 h-3" /> RET_TO_CONSOLE
           </Link>
           <div className="flex items-center gap-2 mt-2">
-            <span className="text-[10px] font-mono font-bold text-primary uppercase tracking-[0.2em]">DEPL_NODE: {project.id.slice(0, 8)}</span>
+            <span className="text-[10px] sm:text-[10px] font-mono font-bold text-primary uppercase tracking-[0.2em]">DEPL_NODE: {project.id.slice(0, 8)}</span>
           </div>
-          <h1 className="text-3xl font-heading font-black text-text-primary uppercase tracking-tight">{project.title}</h1>
-          <p className="text-text-muted text-xs font-mono uppercase tracking-widest">
-            {new Date(project.created_at).toLocaleString()} // SECURE_ACCESS_GRANTED
+          <h1 className="text-2xl sm:text-3xl font-heading font-black text-text-primary uppercase tracking-tight leading-tight">{project.title}</h1>
+          <p className="text-text-muted text-[10px] sm:text-xs font-mono uppercase tracking-widest">
+            {new Date(project.created_at).toLocaleString()} // SECURE_ACCESS
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="gap-2 text-[10px] font-mono tracking-widest font-bold border-border">
-            <MessageSquare className="w-4 h-4" /> OPEN_LOGS
+        <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+          <Button variant="outline" className="flex-1 sm:flex-initial gap-2 text-[10px] font-mono tracking-widest font-bold border-border h-10">
+            <MessageSquare className="w-4 h-4" /> LOGS
           </Button>
           {(project.status === 'awaiting_advance_payment' || project.status === 'awaiting_final_payment') && (
-            <Button className="gap-2 text-[10px] font-mono tracking-widest font-bold shadow-lg shadow-primary/20">
-              <IndianRupee className="w-4 h-4" /> EXECUTE_PAYMENT
+            <Button className="flex-1 sm:flex-initial gap-2 text-[10px] font-mono tracking-widest font-bold shadow-lg shadow-primary/20 h-10">
+              <IndianRupee className="w-4 h-4" /> PAY
             </Button>
           )}
         </div>
@@ -152,12 +152,12 @@ export function ProjectDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Specs & Progress */}
         <div className="lg:col-span-2 flex flex-col gap-6">
-          <Card className="p-8 bg-surface border-border">
+          <Card className="p-6 sm:p-8 bg-surface border-border">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <h2 className="text-xs font-black uppercase tracking-[0.2em] text-text-muted">Technical_Specifications</h2>
+              <h2 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-text-muted">Technical_Specifications</h2>
             </div>
-            <p className="text-text-muted text-sm leading-relaxed font-mono">
+            <p className="text-text-muted text-xs sm:text-sm leading-relaxed font-mono break-words">
               // {project.description}
             </p>
             
@@ -169,8 +169,8 @@ export function ProjectDetail() {
                 { label: 'STACK', value: 'CLOUD_NATIVE', color: 'text-text-muted' },
               ].map((item, i) => (
                 <div key={i} className="flex flex-col gap-1">
-                  <span className="text-[9px] font-mono font-bold text-text-muted tracking-widest">{item.label}</span>
-                  <span className={cn("text-xs font-black tracking-tight uppercase", item.color)}>{item.value}</span>
+                  <span className="text-[8px] sm:text-[9px] font-mono font-bold text-text-muted tracking-widest">{item.label}</span>
+                  <span className={cn("text-[10px] sm:text-xs font-black tracking-tight uppercase truncate", item.color)}>{item.value}</span>
                 </div>
               ))}
             </div>
@@ -210,13 +210,13 @@ export function ProjectDetail() {
             </div>
           </Card>
 
-          {/* New Progression Timeline */}
-          <Card className="p-8 bg-surface border-border">
-            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-text-muted mb-10 flex items-center gap-2">
+          {/* Progression Timeline */}
+          <Card className="p-6 sm:p-8 bg-surface border-border">
+            <h2 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-text-muted mb-10 flex items-center gap-2">
               <Activity className="w-4 h-4 text-primary" /> Lifecycle_Progress
             </h2>
             <div className="relative">
-              <div className="absolute left-3 top-0 bottom-0 w-[1px] bg-border" />
+              <div className="absolute left-[7px] top-0 bottom-0 w-[1px] bg-border" />
               
               <div className="space-y-10 relative">
                 {statuses.map((s, i) => {
@@ -225,28 +225,28 @@ export function ProjectDetail() {
                   const isCurrent = project.status === s.id;
                   
                   return (
-                    <div key={s.id} className="flex gap-8 items-start pl-1 relative">
+                    <div key={s.id} className="flex gap-6 sm:gap-8 items-start pl-[1px] relative">
                       <div className={cn(
-                        "w-4 h-4 rounded-full border-2 z-10 bg-background transition-all duration-500 flex items-center justify-center",
+                        "w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 z-10 bg-background transition-all duration-500 flex items-center justify-center shrink-0",
                         isCompleted ? "bg-primary border-primary" : 
                         isCurrent ? "border-primary scale-125 shadow-[0_0_15px_rgba(94,230,255,0.4)]" : 
                         "border-border"
                       )}>
-                        {isCompleted && <CheckCircle className="w-3 h-3 text-[#0B0F14]" />}
+                        {isCompleted && <CheckCircle className="w-2.5 h-2.5 sm:w-3 h-3 text-[#0B0F14]" />}
                         {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
                       </div>
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 min-w-0">
                         <span className={cn(
-                          "text-[10px] font-black uppercase tracking-widest",
+                          "text-[9px] sm:text-[10px] font-black uppercase tracking-widest",
                           isCompleted || isCurrent ? "text-text-primary" : "text-text-muted"
                         )}>
                           {s.label}
                         </span>
-                        <p className="text-[10px] text-text-muted font-mono leading-relaxed">
+                        <p className="text-[9px] sm:text-[10px] text-text-muted font-mono leading-relaxed truncate-3-lines">
                           {s.desc}
                         </p>
                         {isCurrent && (
-                          <div className="mt-2 text-[9px] font-bold text-primary animate-pulse tracking-widest uppercase font-mono">
+                          <div className="mt-2 text-[8px] sm:text-[9px] font-bold text-primary animate-pulse tracking-widest uppercase font-mono">
                             {isAdmin ? '> PENDING_ADMIN_ACTION' : '> WAITING_FOR_SYNC'}
                           </div>
                         )}

@@ -201,10 +201,10 @@ export function NewProject() {
       <div className="relative">
         <div className="flex items-center justify-between relative z-10">
           {STEPS.map((label, i) => (
-            <div key={label} className="flex flex-col items-center gap-2 group cursor-default">
+            <div key={label} className="flex flex-col items-center gap-2 group cursor-default relative">
               <div
                 className={cn(
-                  "w-12 h-12 rounded-xl flex items-center justify-center font-mono font-bold text-sm border-2 transition-all duration-500",
+                  "w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-mono font-bold text-xs sm:text-sm border-2 transition-all duration-500",
                   step > i + 1 ? 'bg-primary border-primary text-[#0B0F14] shadow-[0_0_20px_rgba(94,230,255,0.3)]' :
                   step === i + 1 ? 'border-primary text-primary shadow-[0_0_20px_rgba(94,230,255,0.2)]' :
                   'bg-surface border-border text-text-muted hover:border-primary/30'
@@ -213,7 +213,7 @@ export function NewProject() {
                 {step > i + 1 ? <Check className="w-5 h-5 stroke-[3]" /> : `0${i + 1}`}
               </div>
               <span className={cn(
-                "text-[9px] font-mono font-bold uppercase tracking-[0.2em] transition-colors duration-500",
+                "text-[7px] sm:text-[9px] font-mono font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-colors duration-500 hidden xs:block",
                 step >= i + 1 ? "text-primary" : "text-text-muted"
               )}>
                 {label}
@@ -245,19 +245,19 @@ export function NewProject() {
                     key={d.id}
                     onClick={() => { setDomain(d.id); setStep(2); }}
                     className={cn(
-                      "p-8 rounded-xl border-2 flex flex-col items-center justify-center gap-4 transition-all group",
+                      "p-4 sm:p-8 rounded-xl border-2 flex flex-col items-center justify-center gap-3 sm:gap-4 transition-all group",
                       domain === d.id
                         ? 'border-primary bg-primary/5 text-primary shadow-lg'
                         : 'border-border bg-surface hover:border-primary/40 hover:bg-surface/80 text-text-primary'
                     )}
                   >
                     <div className={cn(
-                      "p-4 rounded-xl bg-background border border-border group-hover:border-primary/30 transition-all",
+                      "p-3 sm:p-4 rounded-xl bg-background border border-border group-hover:border-primary/30 transition-all",
                       domain === d.id ? "text-primary border-primary/20" : "text-text-muted"
                     )}>
-                      <d.icon className="w-8 h-8" />
+                      <d.icon className="w-6 h-6 sm:w-8 sm:h-8" />
                     </div>
-                    <span className="font-mono font-bold text-xs uppercase tracking-widest">{d.name}</span>
+                    <span className="font-mono font-bold text-[10px] sm:text-xs uppercase tracking-widest">{d.name}</span>
                   </button>
                 ))}
               </div>
@@ -389,12 +389,12 @@ export function NewProject() {
               <div className="bg-background rounded-2xl border border-border p-10 space-y-10 shadow-2xl">
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <IndianRupee className="w-10 h-10 text-primary" />
+                    <IndianRupee className="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
                     <motion.span
                       key={budget}
                       initial={{ scale: 1.1, opacity: 0.7 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      className="text-6xl font-black font-mono text-text-primary tracking-tighter"
+                      className="text-4xl sm:text-6xl font-black font-mono text-text-primary tracking-tighter"
                     >
                       {budget.toLocaleString('en-IN')}
                     </motion.span>

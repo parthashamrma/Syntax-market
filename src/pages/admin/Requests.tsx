@@ -690,7 +690,7 @@ export function Requests() {
       </div>
 
       {/* Kanban Board */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto pb-4 custom-scrollbar">
+      <div className="flex flex-nowrap lg:grid lg:grid-cols-4 gap-6 overflow-x-auto pb-8 custom-scrollbar snap-x snap-mandatory">
         {Object.entries(columns).map(([status, label]) => {
           const columnProjects = projects.filter(p => p.status === status);
           const isDropTarget = dragOverColumn === status;
@@ -699,7 +699,7 @@ export function Requests() {
           return (
             <div 
               key={status} 
-              className="flex flex-col gap-4 min-w-[320px]"
+              className="flex flex-col gap-4 min-w-[280px] sm:min-w-[320px] snap-center shrink-0"
               onDragOver={(e) => handleDragOver(e, status)}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, status)}
