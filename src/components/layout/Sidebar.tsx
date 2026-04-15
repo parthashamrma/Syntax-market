@@ -6,7 +6,7 @@ import {
   GitPullRequest, Radio, User as UserIcon
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { NotificationBell } from './NotificationBell';
+
 
 export function Sidebar() {
   const { user, profile, isAdmin } = useAuthStore();
@@ -88,9 +88,7 @@ export function Sidebar() {
             </p>
           </div>
 
-          <div className="flex items-center">
-            <NotificationBell hideCounter={false} align="left" />
-          </div>
+
         </div>
 
         <button 

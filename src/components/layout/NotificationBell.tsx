@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, Info, CheckCircle, AlertTriangle, Zap, X } from 'lucide-center';
+import { Bell, Info, CheckCircle, AlertTriangle, Zap, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotificationStore } from '@/src/store/notificationStore';
 import { formatDistanceToNow } from 'date-fns';
-import { Bell as BellIcon, Info as InfoIcon, CheckCircle as CheckIcon, AlertTriangle as AlertIcon, Zap as ZapIcon, X as XIcon } from 'lucide-react';
 
 export function NotificationBell({ align = 'right', hideCounter = false }: { align?: 'left' | 'right', hideCounter?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,10 +21,10 @@ export function NotificationBell({ align = 'right', hideCounter = false }: { ali
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'success': return <CheckIcon className="w-4 h-4 text-green-500" />;
-      case 'warning': return <AlertIcon className="w-4 h-4 text-yellow-500" />;
-      case 'update': return <ZapIcon className="w-4 h-4 text-primary" />;
-      default: return <InfoIcon className="w-4 h-4 text-blue-500" />;
+      case 'success': return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'warning': return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+      case 'update': return <Zap className="w-4 h-4 text-primary" />;
+      default: return <Info className="w-4 h-4 text-blue-500" />;
     }
   };
 
@@ -33,24 +32,26 @@ export function NotificationBell({ align = 'right', hideCounter = false }: { ali
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full hover:bg-white/10 transition-colors text-text-muted hover:text-white"
+        className="relative p-2 rounded-lg hover:bg-white/10 transition-colors text-text-muted hover:text-white"
       >
-        <BellIcon className="w-5 h-5" />
+        <Bell className="w-5 h-5" />
         {unreadCount > 0 && !hideCounter && (
-          <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background shadow-[0_0_8px_rgba(124,58,237,0.6)]" />
+          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-primary text-[9px] font-mono font-bold text-[#0B0F14] rounded-full border-2 border-background shadow-[0_0_8px_rgba(94,230,255,0.4)]">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
         )}
       </button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95, x: align === 'right' ? 0 : -20 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className={`absolute bottom-full mb-4 ${align === 'right' ? 'right-0' : 'left-0'} w-80 bg-surface border border-border rounded-xl shadow-2xl z-[60] overflow-hidden`}
+            initial={{ opacity: 0, scale: 0.95, y: -5 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -5 }}
+            className={`absolute top-full mt-2 ${align === 'right' ? 'right-0' : 'left-0'} w-80 bg-surface border border-border rounded-xl shadow-2xl z-[60] overflow-hidden`}
           >
             <div className="p-4 border-b border-border flex justify-between items-center bg-background/50">
-              <h3 className="font-heading font-semibold">Notifications</h3>
+              <h3 className="font-heading font-semibold text-sm">Notifications</h3>
               {unreadCount > 0 && (
                 <button 
                   onClick={markAllAsRead}
@@ -64,7 +65,7 @@ export function NotificationBell({ align = 'right', hideCounter = false }: { ali
             <div className="max-h-96 overflow-y-auto">
               {notifications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <BellIcon className="w-8 h-8 text-text-muted mx-auto mb-2 opacity-20" />
+                  <Bell className="w-8 h-8 text-text-muted mx-auto mb-2 opacity-20" />
                   <p className="text-sm text-text-muted">No notifications yet</p>
                 </div>
               ) : (

@@ -4,6 +4,7 @@ import { Button } from '@/src/components/ui/Button';
 import { Terminal, Settings, User as UserIcon, Activity, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
+import { NotificationBell } from './NotificationBell';
 
 export function Layout() {
   const { user } = useAuthStore();
@@ -80,6 +81,7 @@ export function Layout() {
                 ) : (
                   <div className="flex items-center gap-4">
                     <span className="text-xs text-text-muted font-mono tracking-widest hidden lg:block uppercase">Secure Channel Est.</span>
+                    <NotificationBell hideCounter={false} align="right" />
                   </div>
                 )}
               </nav>
