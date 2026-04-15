@@ -222,10 +222,10 @@ export function NewProject() {
           ))}
         </div>
         {/* Progress Bar Background */}
-        <div className="absolute top-6 left-6 right-6 h-[2px] bg-border -z-0" />
+        <div className="absolute top-5 sm:top-6 left-5 sm:left-6 right-5 sm:right-6 h-[2px] bg-border -z-0" />
         <div 
-          className="absolute top-6 left-6 h-[2px] bg-primary -z-0 transition-all duration-700 shadow-[0_0_10px_rgba(94,230,255,0.5)]"
-          style={{ width: `calc(${((step - 1) / (STEPS.length - 1)) * 100}% - 12px)` }}
+          className="absolute top-5 sm:top-6 left-5 sm:left-6 h-[2px] bg-primary -z-0 transition-all duration-700 shadow-[0_0_10px_rgba(94,230,255,0.5)]"
+          style={{ width: `calc(${((step - 1) / (STEPS.length - 1)) * 100}% - 8px)` }}
         />
       </div>
 
@@ -452,16 +452,16 @@ export function NewProject() {
                   key={scope.tier}
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-surface/50 rounded-2xl border border-border p-10 space-y-8"
+                  className="bg-surface/50 rounded-2xl border border-border p-5 sm:p-10 space-y-8"
                 >
-                  <div className="flex items-center justify-between border-b border-border pb-6">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-border pb-6">
                     <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3">
                       <Terminal className="w-5 h-5 text-primary" /> Current_Alloc_Scope
                     </h3>
                     <div className="text-[10px] font-mono font-bold text-text-muted">EST_TIME: {scope.estimatedDays}D</div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-10">
+                  <div className="grid md:grid-cols-2 gap-8 sm:gap-10">
                     <div className="space-y-4">
                       <p className="text-[10px] font-mono font-bold text-primary uppercase tracking-widest">Enabled_Modules</p>
                       <ul className="space-y-2">
@@ -524,7 +524,7 @@ export function NewProject() {
                 </div>
               )}
 
-              <Card className="bg-surface p-10 border-border space-y-8">
+              <Card className="bg-surface p-5 sm:p-10 border-border space-y-8">
                 <div className="grid md:grid-cols-2 gap-8 pb-8 border-b border-border">
                   <div className="space-y-1">
                     <p className="text-[9px] font-mono font-bold text-text-muted uppercase tracking-widest">Node_Identifier</p>
@@ -564,22 +564,22 @@ export function NewProject() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-border bg-background/50 p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+                <div className="rounded-2xl border border-border bg-background/50 p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary flex-shrink-0">
                       {(() => {
                         const DeliveryIcon = deliveryIcons[deliveryPreference];
                         return <DeliveryIcon className="w-5 h-5" />;
                       })()}
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-text-muted">
+                    <div className="space-y-2 min-w-0 flex-1">
+                      <p className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-text-muted truncate">
                         Project_Delivery_Preference
                       </p>
-                      <p className="text-lg font-black text-text-primary">{selectedDeliveryMeta.title}</p>
-                      <p className="text-sm text-text-muted">{selectedDeliveryMeta.description}</p>
+                      <p className="text-base sm:text-lg font-black text-text-primary leading-tight">{selectedDeliveryMeta.title}</p>
+                      <p className="text-xs sm:text-sm text-text-muted leading-relaxed">{selectedDeliveryMeta.description}</p>
                       {deliveryPreference === 'github_collaboration' && (
-                        <p className="text-[11px] font-mono uppercase tracking-wide text-primary">
+                        <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wide text-primary truncate">
                           COLLAB_USERNAME: @{sanitizedGithubUsername}
                         </p>
                       )}
