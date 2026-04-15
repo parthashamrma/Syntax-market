@@ -125,9 +125,7 @@ export function Layout() {
                 <button
                   id="mobile-menu-toggle"
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className={`flex items-center justify-center w-10 h-10 rounded-lg bg-[#0B0F14] border border-primary/20 text-primary hover:bg-primary/10 active:scale-95 transition-all shrink-0 shadow-[0_0_10px_rgba(94,230,255,0.08)]
-                    ${user ? 'lg:hidden' : 'flex'}
-                  `}
+                  className="flex lg:hidden items-center justify-center w-10 h-10 rounded-lg bg-[#0B0F14] border border-primary/20 text-primary hover:bg-primary/10 active:scale-95 transition-all shrink-0 shadow-[0_0_10px_rgba(94,230,255,0.08)]"
                   aria-label="Toggle Menu"
                   aria-expanded={isMobileMenuOpen}
                 >

@@ -229,7 +229,7 @@ export function NewProject() {
         />
       </div>
 
-      <div className="bg-surface/30 border border-border rounded-2xl p-8 md:p-12 backdrop-blur-sm relative overflow-hidden">
+      <div className="bg-surface/30 border border-border rounded-xxl sm:rounded-2xl p-5 sm:p-8 md:p-12 backdrop-blur-sm relative overflow-hidden">
         {/* Abstract Background Element */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
         
@@ -367,10 +367,10 @@ export function NewProject() {
                 )}
               </div>
 
-              <div className="flex justify-between pt-6 border-t border-border">
-                <Button variant="outline" onClick={() => setStep(1)} className="font-mono font-bold uppercase tracking-widest">Ret_Prev</Button>
-                <Button size="lg" onClick={() => setStep(3)} disabled={!canMoveToResourceAllocation} className="font-mono font-bold uppercase tracking-widest px-10">
-                  Next: Allocate_Resources <ChevronRight className="w-4 h-4 ml-2" />
+              <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-6 border-t border-border">
+                <Button variant="outline" onClick={() => setStep(1)} className="font-mono font-bold uppercase tracking-widest w-full sm:w-auto h-12">Ret_Prev</Button>
+                <Button size="lg" onClick={() => setStep(3)} disabled={!canMoveToResourceAllocation} className="font-mono font-bold uppercase tracking-widest px-6 sm:px-10 w-full sm:w-auto h-12">
+                  <span className="truncate">Next: Allocate_Resources</span> <ChevronRight className="w-4 h-4 ml-2 flex-shrink-0" />
                 </Button>
               </div>
             </motion.div>
@@ -500,10 +500,10 @@ export function NewProject() {
                 </motion.div>
               )}
 
-              <div className="flex justify-between pt-6 border-t border-border">
-                <Button variant="outline" onClick={() => setStep(2)} className="font-mono font-bold uppercase tracking-widest">Ret_Prev</Button>
-                <Button size="lg" onClick={() => { setAgreed(false); setStep(4); }} className="font-mono font-bold uppercase tracking-widest px-10">
-                  Next: Verify_Broadcast <ChevronRight className="w-4 h-4 ml-2" />
+              <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-6 border-t border-border">
+                <Button variant="outline" onClick={() => setStep(2)} className="font-mono font-bold uppercase tracking-widest w-full sm:w-auto h-12">Ret_Prev</Button>
+                <Button size="lg" onClick={() => { setAgreed(false); setStep(4); }} className="font-mono font-bold uppercase tracking-widest px-6 sm:px-10 w-full sm:w-auto h-12">
+                  <span className="truncate">Next: Verify_Broadcast</span> <ChevronRight className="w-4 h-4 ml-2 flex-shrink-0" />
                 </Button>
               </div>
             </motion.div>
@@ -612,17 +612,17 @@ export function NewProject() {
                 </div>
               </Card>
 
-              <div className="flex justify-between pt-6 border-t border-border">
-                <Button variant="outline" onClick={() => setStep(3)} disabled={loading} className="font-mono font-bold uppercase tracking-widest">Ret_Prev</Button>
-                <Button size="lg" onClick={handleSubmit} disabled={!agreed || loading} className="font-mono font-bold uppercase tracking-widest px-12 h-14">
+              <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-6 border-t border-border">
+                <Button variant="outline" onClick={() => setStep(3)} disabled={loading} className="font-mono font-bold uppercase tracking-widest w-full sm:w-auto h-12 sm:h-14">Ret_Prev</Button>
+                <Button size="lg" onClick={handleSubmit} disabled={!agreed || loading} className="font-mono font-bold uppercase tracking-widest px-6 sm:px-12 w-full sm:w-auto h-12 sm:h-14">
                   {loading ? (
-                    <span className="flex items-center gap-3">
+                    <span className="flex items-center justify-center gap-3">
                       <span className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                       BROADCASTING...
                     </span>
                   ) : (
-                    <span className="flex items-center gap-3">
-                      INIT_BROADCAST <Send className="w-4 h-4" />
+                    <span className="flex items-center justify-center gap-3">
+                      INIT_BROADCAST <Send className="w-4 h-4 flex-shrink-0" />
                     </span>
                   )}
                 </Button>
